@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Flipbook</title>
+    <style>
+        :root {
+            --text: #ffffff;
+            --primary: #ffa866;
+            --secondary: #94d5d8;
+            --accent: #6dafca;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            color: var(--text);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 16px rgba(255, 255, 255, 0.4), 0 0 24px rgba(255, 255, 255, 0.2);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(8px);
+            z-index: -1;
+        }
+
+        /* HOME PAGE STYLES */
+        .home-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .home-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0);
+            z-index: 1;
+        }
+
+        .home-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            max-width: none;
+        }
+
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .language-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text);
+            border: 2px solid var(--secondary);
+            padding: 8px 15px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+
+        .language-btn:hover {
+            background: var(--secondary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .language-btn.active {
+            background: var(--primary);
+            border-color: var(--accent);
+            box-shadow: 0 4px 15px rgba(137, 162, 97, 0.4);
+        }
+
+        /* LEVEL SELECTION PAGE STYLES */
+        .level-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .level-title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        .level-subtitle {
+            margin-bottom: 50px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .level-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 900px;
+            margin-bottom: 40px;
+        }
+
+        .level-card, .quiz-level-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            padding: 30px 25px;
+            min-width: 250px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .level-card:hover, .quiz-level-card:hover {
+            transform: translateY(-10px);
+            background: var(--secondary);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .level-age {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .level-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .story-title {
+            font-size: 1.1em;
+            font-style: italic;
+            color: var(--accent);
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .level-description {
+            font-size: 1em;
+            opacity: 0.8;
+            line-height: 1.4;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .quiz-info {
+            font-size: 0.9em;
+            color: var(--accent);
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .back-to-home-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text);
+            border: 2px solid var(--secondary);
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-to-home-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .close-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 2.5em;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+            left: -280px;
+            top: 20px;
+        }
+
+        .close-btn:hover {
+            color: rgba(255, 255, 255, 0.7);
+            transform: translateY(-2px) scale(1.1);
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            color: var(--text);
+            border: none;
+            padding: 20px 35px;
+            font-size: 1.5em;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 10px rgba(137, 162, 97, 0.5), 0 0 20px rgba(137, 162, 97, 0.3), 0 0 30px rgba(137, 162, 97, 0.2);
+        }
+
+        .nav-button.explore-btn {
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(137, 162, 97, 0.3);
+            min-width: 280px;
+        }
+
+        .nav-button.read-btn {
+            background: var(--secondary);
+            box-shadow: 0 4px 15px rgba(167, 203, 171, 0.3);
+        }
+
+        .nav-button.read-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(137, 186, 154, 0.4);
+        }
+
+        .nav-button.quiz-btn {
+            background: var(--accent);
+            box-shadow: 0 4px 15px rgba(137, 186, 154, 0.3);
+        }
+
+        .nav-button.quiz-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(167, 203, 171, 0.4);
+        }
+
+        .nav-button.explore-btn {
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(137, 162, 97, 0.3);
+        }
+
+        .nav-button.explore-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(137, 186, 154, 0.4);
+        }
+
+        .home-title {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .home-subtitle {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            color: var(--text);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .read-button {
+            background: var(--primary);
+            color: var(--text);
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.4em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 8px 25px rgba(137, 162, 97, 0.4);
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .read-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(137, 186, 154, 0.6);
+            background: var(--accent);
+        }
+
+        .read-button:active {
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hide flipbook initially */
+        .flipbook-container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--background);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            display: none;
+        }
+
+        .book-header {
+            background: var(--primary);
+            color: var(--text);
+            padding: 15px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .book-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .page-counter {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .page-display {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            min-height: 400px;
+            background: var(--background);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .btn.side-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text);
+            border: 2px solid var(--secondary);
+            padding: 15px 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(148, 213, 216, 0.2);
+            min-width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .btn.side-nav:hover {
+            background: var(--secondary);
+            border-color: var(--primary);
+            transform: translateY(-50%) translateX(0) scale(1.1);
+            box-shadow: 0 6px 20px rgba(148, 213, 216, 0.4);
+        }
+
+        .btn.side-nav:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(10, 29, 11, 0.3);
+            border-color: rgba(148, 213, 216, 0.2);
+            cursor: not-allowed;
+            transform: translateY(-50%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-nav {
+            left: 20px;
+        }
+
+        .right-nav {
+            right: 20px;
+        }
+
+        .page-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateX(50px);
+        }
+
+        .page.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .page.prev {
+            transform: translateX(-50px);
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .controls {
+            background: linear-gradient(135deg, rgba(148, 213, 216, 0.1), rgba(109, 175, 202, 0.1));
+            padding: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            backdrop-filter: blur(10px);
+            border-top: 2px solid rgba(148, 213, 216, 0.2);
+            min-height: 80px;
+        }
+
+        /* RTL Support for Arabic */
+        .flipbook-container.rtl {
+            direction: rtl;
+        }
+
+        .flipbook-container.rtl .book-header {
+            text-align: right;
+        }
+
+        .flipbook-container.rtl .controls {
+            direction: rtl;
+        }
+
+        /* RTL Support for side navigation */
+        .flipbook-container.rtl .left-nav {
+            left: auto;
+            right: 20px;
+        }
+
+        .flipbook-container.rtl .right-nav {
+            right: auto;
+            left: 20px;
+        }
+
+        .flipbook-container.rtl .nav-buttons {
+            flex-direction: row-reverse;
+        }
+
+        .flipbook-container.rtl .page-counter {
+            direction: rtl;
+        }
+
+        /* RTL Navigation - swap prev/next button positions */
+        .flipbook-container.rtl .nav-buttons .btn:first-child {
+            order: 2;
+        }
+
+        .flipbook-container.rtl .nav-buttons .btn:last-child {
+            order: 1;
+        }
+
+        /* Match website styling - Enhanced flipbook design */
+        .flipbook-container {
+            max-width: 900px;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(148, 213, 216, 0.1));
+            border-radius: 25px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            display: none;
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(148, 213, 216, 0.3);
+        }
+
+        .book-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--text);
+            padding: 20px 25px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(255, 168, 102, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid rgba(148, 213, 216, 0.3);
+        }
+
+        .book-header .back-to-home-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text);
+            border: 2px solid var(--secondary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+
+        .book-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--text);
+            padding: 20px 25px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(255, 168, 102, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid rgba(148, 213, 216, 0.3);
+        }
+
+        .book-header .back-to-home-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text);
+            border: 2px solid var(--secondary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+
+        .book-header .back-to-home-btn:hover {
+            background: var(--secondary);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(137, 186, 154, 0.2);
+        }
+
+        .read-aloud-header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text);
+            border: 2px solid var(--secondary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+
+        .read-aloud-header-btn:hover {
+            background: var(--secondary);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(137, 186, 154, 0.2);
+        }
+
+        .book-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            flex: 1;
+            text-align: center;
+            margin: 0 20px;
+        }
+
+        .page-counter {
+            font-size: 0.9em;
+            opacity: 0.9;
+            font-weight: 500;
+            position: absolute;
+            left: 50%;
+            bottom: -25px;
+            transform: translateX(-50%);
+        }
+            position: absolute;
+            left: 50%;
+            bottom: -5px;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+        }
+
+        /* RTL adjustments for back button */
+        .flipbook-container.rtl .book-header .back-to-home-btn {
+            order: 3;
+        }
+
+        .controls {
+            background: linear-gradient(135deg, rgba(148, 213, 216, 0.1), rgba(109, 175, 202, 0.1));
+            padding: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            backdrop-filter: blur(10px);
+            border-top: 2px solid rgba(148, 213, 216, 0.2);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .btn.minimal-nav {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text);
+            border: 2px solid var(--secondary);
+            padding: 15px 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(148, 213, 216, 0.2);
+            min-width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn.minimal-nav:hover {
+            background: var(--secondary);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(148, 213, 216, 0.4);
+        }
+
+        .btn.minimal-nav:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(10, 29, 11, 0.3);
+            border-color: rgba(148, 213, 216, 0.2);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .end-options {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* Quiz button styles removed - now uses minimal-nav class */
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .page-display {
+                height: 60vh;
+                min-height: 300px;
+            }
+
+            .controls {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nav-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                max-width: 120px;
+            }
+
+            .book-title {
+                font-size: 1.2em;
+            }
+
+            .fullscreen-btn {
+                position: static;
+                transform: none;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-display {
+                height: 50vh;
+                min-height: 250px;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+
+        /* Touch gesture indicators */
+        .swipe-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #7f8c8d;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- LEVEL SELECTION PAGE -->
+    <div class="level-page" id="levelPage">
+        <div class="level-title">
+            <span class="level-title-en">Choose Your Level</span>
+            <span class="level-title-ar" style="display: none;">اختر مستواك</span>
+        </div>
+        
+        <div class="level-subtitle">
+            <!-- X Close Button -->
+            <button class="close-btn" id="closeLevelPage">×</button>
+        </div>
+        
+        <div class="level-container">
+            <div class="level-card" data-level="curious">
+                <div class="level-age">6-12</div>
+                <div class="level-name">
+                    <span class="level-name-en">Young Explorers</span>
+                    <span class="level-name-ar" style="display: none;">المستكشفون الصغار</span>
+                </div>
+                <div class="story-title">
+                    <span class="story-title-en">The Sun Sneezes</span>
+                    <span class="story-title-ar" style="display: none;">الشمس تعطس</span>
+                </div>
+
+            </div>
+            
+            <div class="level-card" data-level="seekers">
+                <div class="level-age">13-18</div>
+                <div class="level-name">
+                    <span class="level-name-en">Senior Explorers</span>
+                    <span class="level-name-ar" style="display: none;">المستكشفون الكبار</span>
+                </div>
+                <div class="story-title">
+                    <span class="story-title-en">Celeste's Story</span>
+                    <span class="story-title-ar" style="display: none;">قصة سيليست</span>
+                </div>
+
+            </div>
+        </div>
+        
+        <button class="back-to-home-btn" id="backToHomeFromLevel">
+            <span class="back-home-en">Back to Home</span>
+            <span class="back-home-ar" style="display: none;">العودة للرئيسية</span>
+        </button>
+    </div>
+
+    <!-- QUIZ LEVEL SELECTION PAGE -->
+    <div class="level-page" id="quizLevelPage">
+        <div class="level-title">
+            <span class="level-title-en">Choose Your Quiz Level</span>
+            <span class="level-title-ar" style="display: none;">اختر مستوى الاختبار</span>
+        </div>
+        
+        <div class="level-subtitle">
+            <!-- X Close Button -->
+            <button class="close-btn" id="closeQuizLevelPage">×</button>
+        </div>
+        
+        <div class="level-container">
+            <div class="quiz-level-card" data-quiz-level="curious">
+                <div class="level-age">6-12</div>
+                <div class="level-name">
+                    <span class="level-name-en">Young Explorers</span>
+                    <span class="level-name-ar" style="display: none;">المستكشفون الصغار</span>
+                </div>
+                <div class="story-title">
+                    <span class="story-title-en">The Sun Sneezes</span>
+                    <span class="story-title-ar" style="display: none;">الشمس تعطس</span>
+                </div>
+                <div class="level-description">
+                    <span class="level-desc-en">Basic story comprehension and simple science concepts</span>
+                    <span class="level-desc-ar" style="display: none;">فهم أساسي للقصة ومفاهيم علمية بسيطة</span>
+                </div>
+                <div class="quiz-info">
+                    <span class="quiz-info-en">📝 5 questions • Multiple choice</span>
+                    <span class="quiz-info-ar" style="display: none;">📝 ٥ أسئلة • اختيار متعدد</span>
+                </div>
+            </div>
+            
+            <div class="quiz-level-card" data-quiz-level="seekers">
+                <div class="level-age">13-18</div>
+                <div class="level-name">
+                    <span class="level-name-en">Senior Explorers</span>
+                    <span class="level-name-ar" style="display: none;">المستكشفون الكبار</span>
+                </div>
+                <div class="story-title">
+                    <span class="story-title-en">Celeste's Story</span>
+                    <span class="story-title-ar" style="display: none;">قصة سيليست</span>
+                </div>
+                <div class="level-description">
+                    <span class="level-desc-en">Deeper analysis and scientific understanding</span>
+                    <span class="level-desc-ar" style="display: none;">تحليل أعمق وفهم علمي</span>
+                </div>
+                <div class="quiz-info">
+                    <span class="quiz-info-en">📝 7 questions • Mixed format</span>
+                    <span class="quiz-info-ar" style="display: none;">📝 ٧ أسئلة • تنسيق مختلط</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div class="home-page" id="homePage">
+        <div class="home-overlay"></div>
+        
+        <!-- Language Selector -->
+        <div class="language-selector">
+            <button class="language-btn" id="englishBtn" data-lang="en">English</button>
+                        <button class="language-btn" id="arabicBtn" data-lang="ar">العربية</button>
+        </div>
+        
+        <div class="home-content">
+            <div class="button-container">
+                <div class="button-row">
+                    <button class="nav-button read-btn" id="readButton">
+                        <span class="btn-text-en">Read</span>
+                        <span class="btn-text-ar" style="display: none;">اقرأ</span>
+                    </button>
+                    <button class="nav-button quiz-btn" id="quizButton">
+                        <span class="btn-text-en">Quiz</span>
+                        <span class="btn-text-ar" style="display: none;">اختبار</span>
+                    </button>
+                </div>
+                <button class="nav-button explore-btn" id="exploreButton">
+                    <span class="btn-text-en">Explore Live Space Weather</span>
+                    <span class="btn-text-ar" style="display: none;">استكشف طقس الفضاء الان</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLIPBOOK APPLICATION -->
+    <div class="flipbook-container" id="flipbook">
+        <div class="book-header">
+            <button class="back-to-home-btn" id="backToHomeFromFlipbook">
+                <span class="back-home-en">← Back</span>
+                <span class="back-home-ar" style="display: none;">← رجوع</span>
+            </button>
+            <div class="book-title" id="bookTitle">Interactive Flipbook</div>
+            <div class="page-counter" id="pageCounter">Page 1 of 10</div>
+            <button class="read-aloud-header-btn" id="readAloudBtn">
+                <span class="read-aloud-en">Read Aloud</span>
+                <span class="read-aloud-ar" style="display: none;">اقرأ بصوت عالٍ</span>
+            </button>
+        </div>
+
+        <div class="page-display">
+            <button class="btn side-nav left-nav" id="prevBtn">
+                <span class="prev-en"><</span>
+                <span class="prev-ar" style="display: none;">></span>
+            </button>
+            <div class="page-container" id="pageContainer">
+                <!-- Pages will be dynamically inserted here -->
+            </div>
+            <button class="btn side-nav right-nav" id="nextBtn">
+                <span class="next-en">></span>
+                <span class="next-ar" style="display: none;"><</span>
+            </button>
+            <div class="loading-indicator" id="loadingIndicator">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <!-- Navigation buttons moved to page-display area -->
+        </div>
+
+        <!-- Quiz button that appears after last page -->
+        <div class="end-options" id="endOptions" style="display: none;">
+            <button class="btn minimal-nav" id="goToQuizBtn">
+                <span class="quiz-en">Take Quiz 📝</span>
+                <span class="quiz-ar" style="display: none;">خذ الاختبار 📝</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // IMAGE CONFIGURATION SECTION
+        // ========================================
+        // 📝 INSTRUCTIONS FOR ADDING YOUR IMAGES:
+        // 1. Replace the example filenames below with your actual image files
+        // 2. You can use local files (e.g., "page1.jpg") or full URLs
+        // 3. Make sure all images are in the same folder as this HTML file (for local files)
+        // 4. Supported formats: JPG, PNG, GIF, WebP
+        // 5. To add more pages: just add more filenames to this array
+        // 6. To remove pages: delete the corresponding lines
+        
+        // Level-specific page arrays with language support
+        const levelPages = {
+            'curious': {
+                'en': [
+                    "page1eng.jpeg",
+                    "page2eng.jpeg", 
+                    "page3eng.jpeg",
+                    "page4eng.jpeg",
+                    "page5eng.jpeg",
+                    "page6eng.jpeg",
+                    "page7eng.jpeg",
+                    "page8eng.jpeg",
+                    "page9eng.jpeg",
+                    "page10eng.jpeg"
+                ],
+                'ar': [
+                    "page1arbc.jpeg",
+                    "page3arbc.jpeg",
+                    "page2arbc.jpeg",
+                    "page4arbc.jpeg",
+                    "page5arbc.jpeg",
+                    "page6arbc.jpeg",
+                    "page7arbc.jpeg",
+                    "page8arbc.jpeg",
+                    "page9arbc.jpeg",
+                    "page10arbc.jpeg"
+                ]
+            },
+            'seekers': {
+                'en': [
+                    "coverfotoeng.jpeg",
+                    "page111.jpeg",
+                    "page222.jpeg",
+                    "page333.jpeg",
+                    "page444.jpeg",
+                    "page555.jpeg",
+                    "page666.jpeg",
+                    "page777.jpeg",
+                    "page888.jpeg",
+                    "page999.jpeg"
+                ],
+                'ar': [
+                    "coverfotoarbc.jpeg",
+                    "safha1.jpeg",
+                    "safha2.jpeg",
+                    "safha3.jpeg",
+                    "safha4.jpeg",
+                    "safha5.jpeg",
+                    "safha6.jpeg",
+                    "safha7.jpeg",
+                    "safha8.jpeg",
+                    "safha9.jpeg"
+                ]
+            }
+        };
+
+        // Get pages based on selected level and language
+        function getBookPages() {
+            const selectedLevel = window.selectedLevel || 'curious';
+            
+            // Check multiple ways to determine language
+            const arabicBtn = document.getElementById('arabicBtn');
+            const isArabicFromBtn = arabicBtn && arabicBtn.classList.contains('active');
+            const isArabicFromGlobal = window.currentLanguage === 'ar';
+            const isArabic = isArabicFromBtn || isArabicFromGlobal;
+            
+            const language = isArabic ? 'ar' : 'en';
+            
+            console.log(`🌐 Language detection: ${language}, Level: ${selectedLevel}`);
+            console.log(`🔍 Arabic button active:`, isArabicFromBtn);
+            console.log(`🔍 Global language:`, window.currentLanguage);
+            
+            const levelData = levelPages[selectedLevel];
+            if (levelData && levelData[language]) {
+                console.log(`📚 Loading ${language} pages for ${selectedLevel}:`, levelData[language]);
+                return levelData[language];
+            }
+            
+            // Fallback to English if Arabic not available, then to young explorers English
+            const fallback = (levelData && levelData['en']) || levelPages['curious']['en'];
+            console.log(`⚠️ Using fallback pages:`, fallback);
+            return fallback;
+        }
+
+        // Legacy bookPages for backward compatibility
+        const bookPages = [
+            // 🖼️ ADD YOUR IMAGE FILENAMES HERE:
+            // Replace these example names with your actual image files
+            "page1.jpg",      // Page 1
+            "page2.jpg",      // Page 2  
+            "page3.jpg",      // Page 3
+            "page4.jpg",      // Page 4
+            "page5.jpg",      // Page 5
+            "page6.jpg",      // Page 6
+            "page7.jpg",      // Page 7
+            "page8.jpg",      // Page 8
+            "page9.jpg",      // Page 9
+            "page10.jpg",     // Page 10
+            "page11.jpg",     // Page 11
+            "page12.jpg",     // Page 12
+            "page13.jpg",     // Page 13
+            "page14.jpg",     // Page 14
+            "page15.jpg",     // Page 15
+            
+            // 📋 TO ADD MORE PAGES: 
+            // Uncomment and modify the lines below, or add new ones
+            // "page16.jpg",     // Page 16
+            // "page17.jpg",     // Page 17
+            // "page18.jpg",     // Page 18
+            // "page19.jpg",     // Page 19
+            // "page20.jpg",     // Page 20
+        ];
+
+        // ========================================
+        // CUSTOMIZATION SETTINGS
+        // ========================================
+        const settings = {
+            // 🎨 ANIMATION SPEED (in milliseconds)
+            // Lower = faster, Higher = slower
+            animationSpeed: 500,
+            
+            // 📖 BOOK TITLE (appears at the top)
+            bookTitle: "My Interactive Flipbook",
+            
+            // 🎯 AUTO-HIDE CONTROLS (in milliseconds, 0 = never hide)
+            autoHideControls: 0,
+            
+            // 📱 ENABLE TOUCH GESTURES
+            enableTouchGestures: true,
+            
+            // ⌨️ ENABLE KEYBOARD NAVIGATION  
+            enableKeyboardNav: true
+        };
+
+        // ========================================
+        // APPLICATION CODE (Don't modify unless you know what you're doing)
+        // ========================================
+        
+        class FlipbookApp {
+            constructor() {
+                // Get pages based on selected level
+                const currentBookPages = getBookPages();
+                
+                this.currentPage = 0;
+                this.totalPages = currentBookPages.length;
+                this.bookPages = currentBookPages;
+                this.isAnimating = false;
+                this.touchStartX = 0;
+                this.touchEndX = 0;
+                
+                this.initializeElements();
+                this.createPages();
+                this.setupEventListeners();
+                this.updateDisplay();
+                this.preloadImages();
+            }
+
+            initializeElements() {
+                this.flipbook = document.getElementById('flipbook');
+                this.pageContainer = document.getElementById('pageContainer');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.readAloudBtn = document.getElementById('readAloudBtn');
+                this.backToHomeBtn = document.getElementById('backToHomeFromFlipbook');
+                this.goToQuizBtn = document.getElementById('goToQuizBtn');
+                this.endOptions = document.getElementById('endOptions');
+                this.loadingIndicator = document.getElementById('loadingIndicator');
+            }
+
+            createPages() {
+                this.pageContainer.innerHTML = '';
+                
+                this.bookPages.forEach((imageSrc, index) => {
+                    const img = document.createElement('img');
+                    img.src = imageSrc;
+                    img.alt = `Page ${index + 1}`;
+                    img.className = 'page';
+                    img.style.display = 'none';
+                    
+                    img.onload = () => {
+                        if (index === this.currentPage) {
+                            this.showPage(index);
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        console.warn(`Failed to load image: ${imageSrc}`);
+                        // Create a placeholder for missing images
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'page';
+                        placeholder.style.cssText = `
+                            width: 400px; height: 300px; background: #f0f0f0; 
+                            display: flex; align-items: center; justify-content: center;
+                            border: 2px dashed #ccc; color: #666; font-size: 1.1em;
+                        `;
+                        placeholder.textContent = `Page ${index + 1}\n(Image not found)`;
+                        img.replaceWith(placeholder);
+                    };
+                    
+                    this.pageContainer.appendChild(img);
+                });
+            }
+
+            setupEventListeners() {
+                // Navigation buttons
+                this.prevBtn.addEventListener('click', () => this.previousPage());
+                this.nextBtn.addEventListener('click', () => this.nextPage());
+                
+                // Read aloud button
+                this.readAloudBtn.addEventListener('click', () => this.readCurrentPage());
+                
+                // Back to home button
+                this.backToHomeBtn.addEventListener('click', () => this.goBackToHome());
+
+                // Quiz button
+                this.goToQuizBtn.addEventListener('click', () => this.goToQuiz());
+
+                // Keyboard navigation
+                if (settings.enableKeyboardNav) {
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'ArrowLeft') this.previousPage();
+                        if (e.key === 'ArrowRight') this.nextPage();
+                        if (e.key === ' ') { // Spacebar for read aloud
+                            e.preventDefault();
+                            this.readCurrentPage();
+                        }
+                    });
+                }
+
+                // Touch gestures
+                if (settings.enableTouchGestures) {
+                    this.pageContainer.addEventListener('touchstart', (e) => {
+                        this.touchStartX = e.changedTouches[0].screenX;
+                    });
+
+                    this.pageContainer.addEventListener('touchend', (e) => {
+                        this.touchEndX = e.changedTouches[0].screenX;
+                        this.handleSwipe();
+                    });
+                }
+            }
+
+            handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = this.touchStartX - this.touchEndX;
+                
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        this.nextPage(); // Swipe left = next page
+                    } else {
+                        this.previousPage(); // Swipe right = previous page
+                    }
+                }
+            }
+
+            showLoading() {
+                this.loadingIndicator.style.display = 'block';
+            }
+
+            hideLoading() {
+                this.loadingIndicator.style.display = 'none';
+            }
+
+            showPage(pageIndex) {
+                const pages = this.pageContainer.querySelectorAll('.page');
+                
+                pages.forEach((page, index) => {
+                    page.style.display = 'none';
+                    page.classList.remove('active', 'prev');
+                });
+
+                if (pages[pageIndex]) {
+                    pages[pageIndex].style.display = 'block';
+                    setTimeout(() => {
+                        pages[pageIndex].classList.add('active');
+                    }, 10);
+                }
+                
+                this.hideLoading();
+            }
+
+            readCurrentPage() {
+                // Stop any current speech
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    this.updateReadAloudButton(false);
+                    return;
+                }
+
+                const isArabic = document.getElementById('arabicBtn') && document.getElementById('arabicBtn').classList.contains('active');
+                const pageText = this.getPageText(this.currentPage, isArabic);
+                
+                if (!pageText) {
+                    console.warn('No text available for current page');
+                    return;
+                }
+
+                // Create speech synthesis utterance
+                const utterance = new SpeechSynthesisUtterance(pageText);
+                
+                // Set language
+                utterance.lang = isArabic ? 'ar-SA' : 'en-US';
+                
+                // Set voice properties
+                utterance.rate = 0.8; // Slightly slower for better comprehension
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+
+                // Event handlers
+                utterance.onstart = () => {
+                    this.updateReadAloudButton(true);
+                };
+
+                utterance.onend = () => {
+                    this.updateReadAloudButton(false);
+                };
+
+                utterance.onerror = (event) => {
+                    console.error('Speech synthesis error:', event.error);
+                    this.updateReadAloudButton(false);
+                };
+
+                // Start speaking
+                window.speechSynthesis.speak(utterance);
+            }
+
+            updateReadAloudButton(isReading) {
+                const readAloudBtn = this.readAloudBtn;
+                const isArabic = document.getElementById('arabicBtn') && document.getElementById('arabicBtn').classList.contains('active');
+                
+                if (isReading) {
+                    readAloudBtn.querySelector('.read-aloud-en').textContent = 'Stop';
+                    readAloudBtn.querySelector('.read-aloud-ar').textContent = 'توقف';
+                    readAloudBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
+                } else {
+                    readAloudBtn.querySelector('.read-aloud-en').textContent = 'Read Aloud';
+                    readAloudBtn.querySelector('.read-aloud-ar').textContent = 'اقرأ بصوت عالٍ';
+                    readAloudBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+                }
+            }
+
+            getPageText(pageIndex, isArabic) {
+                const selectedLevel = window.selectedLevel || 'curious';
+                
+                // Text content organized by level and language
+                const textContent = {
+                    'curious': {
+                        'ar': {
+                            0: "الشَّمْسُ تَعْطِسُ",
+                            1: "كُنْتُ أَعِيشُ عَلَى أَكْبَرِ وَأَلْمَعِ نَجْمٍ فِي سَمَائِنَا: الشَّمْسِ. كَانَ هَذَا هُوَ بَيْتِي! ثُمَّ، فِي صَبَاحِ أَحَدِ الْأَيَّامِ، شَعَرْتُ بِدَغْدَغَةٍ نَارِيَّةٍ عِمْلَاقَةٍ بَدَأَتْ عَمِيقًا فِي دَاخِلِي.",
+                            2: "تَمْتَمَتِ الشَّمْسُ قَائِلَةً: هَا... هَا... هَا... هاتشووو! أَطْلَقَتِ الشَّمْسُ عَطْسَةً عِمْلَاقَةً، وَفَجْأَةً، وَجَدْتُ نَفْسِي أَطِيرُ!",
+                            3: "كُنْتُ قِطْعَةً صَغِيرَةً وَضَاحِكَةً مِنْ تِلْكَ الْعَطْسَةِ، وَاسْمِي هُوَ شَرَارَةُ. طِرْتُ مُبَاشَرَةً إِلَى الْفَضَاءِ! صَرَخْتُ: وَيِيِي! يَا لَهَا مِنْ مُغَامَرَةٍ سَتَكُونُ!",
+                            4: "مَحَطَّتِي الْأُولَى: الْأَقْمَارُ الصِّنَاعِيَّةُ. انْطَلَقْتُ بِجِوَارِهَا وَدَغْدَغْتُهَا قَلِيلًا. بَدَأَتْ تَدُورُ وَشَعَرَتْ بِالدُّوَارِ! رَأَتْهُمْ عَالِمَةٌ عَلَى الْأَرْضِ وَهُمْ يَتَأَرْجَحُونَ. أَرْسَلَتْ إِشَارَةً لِلْمُسَاعَدَةِ فِي إِصْلَاحِهِمْ. قَالَتْ: كُلُّ شَيْءٍ أَفْضَلُ!، وَوَاصَلْتُ طَرِيقِي",
+                            5: "بَعْدَ ذَلِكَ، انْطَلَقْتُ بِسُرْعَةٍ وَدَغْدَغْتُ خُطُوطَ الْكَهْرَبَاءِ الْكَبِيرَةَ. تَلَوَّتِ الْخُطُوطُ، وَبُوُوفْ! انْطَفَأَتِ الْأَضْوَاءُ! جَاءَتْ عَامِلَةٌ فِي شَاحِنَةٍ كَبِيرَةٍ بِسُرْعَةٍ. سَاعَدَتْ فِي إِصْلَاحِ الْكَهْرَبَاءِ. هَتَفَتْ: لَقَدْ أُضِيئَتْ! كُنْتُ أَتَسَبَّبُ فِي كُلِّ أَنْوَاعِ الْمَشَاغَبَةِ!",
+                            6: "حَاوَلْتُ الرَّقْصَ دَاخِلَ مَحَطَّةِ الْفَضَاءِ، لَكِنْ لَمْ أَسْتَطِعِ الدُّخُولَ! كَانَ رُوَّادُ الْفَضَاءِ آمِنِينَ فِي الدَّاخِلِ. مَحَطَّةُ الْفَضَاءِ الْخَاصَّةُ بِهِمْ عِبَارَةٌ عَنْ مَنْزِلٍ فَائِقِ الْقُوَّةِ، بُنِيَ لِحِمَايَتِهِمْ مِنْ كُلِّ عَطَسَاتِ الشَّمْسِ. لَوَّحُوا لِي تَرْحِيبًا مِنْ حِصْنِهِمِ الْمُرِيحِ.",
+                            7: "مَرَرْتُ بِسُرْعَةٍ بِجَانِبِ طَائِرَةٍ فِي السَّمَاءِ. دَغْدَغْتُ جِهَازَ الرَّادْيُو الْخَاصِّ بِالطَّيَّارِ بِسُرْعَةٍ. طَنِينٌ... طَنِينٌ... صَدَرَ صَوْتُ الرَّادْيُو. لَكِنَّ الطَّيَّارَ بَقِيَ هَادِئًا تَمَامًا. كَانَ يَعْرِفُ بِالضَّبْطِ مَا يَجِبُ فِعْلُهُ لِمُوَاصَلَةِ الطَّيَرَانِ بِأَمَانٍ.",
+                            8: "وَصَلْتُ إِلَى جَرَّارٍ زِرَاعِيٍّ فِي حَقْلٍ. دَغْدَغْتُ شَاشَةَ الْخَرِيطَةِ الْخَاصَّةِ بِهِ، وَأَصْبَحَتْ فَارِغَةً! ابْتَسَمَ الْمُزَارِعُ زَيْنٌ فَقَطْ. قَالَ: حَانَ الْوَقْتُ لِأَقُودَ بِنَفْسِي! وَوَاصَلَ الْقِيَادَةَ بِشَكْلٍ مِثَالِيٍّ، حَتَّى بِدُونِ الشَّاشَةِ. الْبَشَرُ أَذْكِيَاءُ جِدًّا!",
+                            9: "وَأَخِيرًا، بَدَأَتْ طَاقَتِي تَنْفَدُ. انْتَهَتْ رِحْلَتِي. لَمَسْتُ قِمَّةَ سَمَاءِ الْأَرْضِ وَأَطْلَقْتُ كُلَّ مَا تَبَقَّى مِنْ نُورِي. نَظَرَ النَّاسُ عَلَى الْأَرْضِ لِيَرَوْنِي وَأَنَا أَتَوَهَّجُ. رَأَوْا أَلْوَانِي الْجَمِيلَةَ وَالْمُشْرِقَةَ! هَتَفُوا: يَا إِلَهِي! الشَّفَقُ الْقُطْبِيُّ! قَدَّمْتُ عَرْضًا أَخِيرًا وَجَمِيلًا قَبْلَ أَنْ أَتَلَاشَى."
+                        },
+                        'en': {
+                            0: "The Sun Sneezes",
+                            1: "I used to live on the biggest, brightest star in our sky: the Sun. It was home! Then, one morning, I felt a giant, fiery tickle start deep inside.",
+                            2: "'А-a-a-a...' the Sun rumbled. CHOooo! The Sun let out a giant sneeze, and suddenly; I was flying!",
+                            3: "I was a tiny, giggling piece of that sneeze, and my name is Sparky: I flew right out into space! 'Whee!' I shouted. 'What an adventure this is going to be!'",
+                            4: "My first stop: the satellites! I zipped by and gave them a little tickle. They started spinning and got all dizzy! A scientist on Earth saw them wobble. She sent a signal to help fix them. 'All better!' she said, and I kept going.",
+                            5: "Next, I zoomed down and tickled the big power lines. The lines wiggled, and poof! The lights went out! A worker in a big truck came quickly: She helped fix the power: 'They're on!' she cheered. I was causing all kinds of mischief!",
+                            6: "I tried to dance inside the space station, but I couldn't get in! The astronauts were safe inside. Their space station is a super-strong house, built to protect them from all the Sun's sneezes. They just waved hello at me from their cozy fort.",
+                            7: "I zipped by an airplane in the sky. I gave the pilot's radio a quick tickle. Buzz... Buzz... went the radio. But Pilot Pat was totally calm. She knew just what to do to keep flying safely.",
+                            8: "I made it all the way down to a tractor in a field. I tickled its map screen, and it went blank! Farmer Fran just smiled. 'Time to steer myself?' she said. She kept driving perfectly, even without the screen. Humans are so clever!",
+                            9: "Finally, I was running out of energy. My journey was over. I touched the very top of Earth's sky and let out all my remaining light. People on Earth looked up to see me glow. They saw my beautiful, bright colors! 'Wow! The Aurora!' they cheered. I put on a final, beautiful show before I faded away."
+                        }
+                    },
+                    'seekers': {
+                        'en': {
+                            0: "Weather Beyond: A Space Weather Adventure - Follow Celeste as she discovers how solar storms affect our technology and connect us to the cosmos.",
+                            1: "I'm Celeste, and every clear night I set up my telescope on the rooftop. The stars feel close, and my telescope lets me chase galaxies, nebulae, and wild things in the night sky. But tonight…nothing is working. My telescope's camera keeps flickering, and my star mapping app won't update.",
+                            2: "\"Seriously?\" I muttered, rebooting my phone for the millionth time. The screen froze. My telescope's motor sounded weak, then died. Dad poked his head out the window, coffee in hand. \"Solar storm, maybe?\" he said. \"Space weather hits the tech sometimes.\"",
+                            3: "I blinked. Space weather? I thought that was just science class stuff: solar flares, coronal mass ejections—giant eruptions from the Sun, hurling plasma and energy through space. Could that really reach us here?",
+                            4: "I pulled up the NASA space weather alert. \"Major CME,\" the page flashed. \"Geomagnetic storm likely tonight.\" My favorite astronomy app had a pop-up: \"Satellite tracking offline due to increased solar activity.\"",
+                            5: "Dad explained, \"CME's are like giant clouds of charged particles from the Sun. When they reach Earth, they mess with power lines, GPS, and even telescopes. The Earth's magnetic field usually shields us, but tonight it's getting hammered.\"",
+                            6: "I messaged my astronomy club group chat. Zoey replied, \"My Wi-Fi's down. Jamie says her telescope is acting up, too. Is this why sometimes the Northern Lights show up farther south?\" I smiled, thinking how space weather isn't just a science topic—it's something that connects us all.",
+                            7: "Instead of feeling defeated, I flipped through my old paper star charts and found Orion. I guided my telescope manually, charting what I could by hand. Tonight, the sky wasn't just stars—it was a reminder of how the Sun's power can reach across 150 million kilometers and touch my little corner of Earth.",
+                            8: "As the geomagnetic storm continued, I stared at the sky. Even though my tech was down, I felt a new connection to the cosmos. Somewhere, the auroras might be burning bright—maybe even visible from our city if the solar storm was strong enough.",
+                            9: "Tomorrow, everything would be back to normal—phone, telescope, internet. But now I understood: studying the stars isn't just about looking out. It's about learning how the Sun and Earth are always in conversation, sending signals and storms, connecting every astronomer beneath the sky."
+                        },
+                        'ar': {
+                            // Arabic text for seekers level - Celeste's space weather story
+                            0: "سِيليستُ ورِسَالةُ سَمَاءِ اللَّيلِ السِّرِّيَّة .",
+                            1: "أَنَا سِيليستُ، وفِي كُلِّ لَيْلَةٍ صَافِيَةٍ أُعِدُّ تِلِسْكُوبِي عَلَى سَطْحِ المَنْزِلِ. النُّجُومُ تَبْدُو قَرِيبَةً، وَتِلِسْكُوبِي يَسْمَحُ لِي بِمُطَارَدَةِ المَجَرَّاتِ، وَالسُّدُمِ، وَالأَشْيَاءِ الغَرِيبَةِ فِي سَمَاءِ اللَّيْلِ. لَكِنَّ اللَّيْلَةَ... لَا شَيْءَ يَعْمَلُ. كَامِيرَا تِلِسْكُوبِي تَسْتَمِرُّ فِي الوَمِيضِ، وَتَطْبِيقُ خَرِيطَةِ النُّجُومِ الخَاصِّ بِي لَا يَقُومُ بِالتَّحْدِيثِ.",
+                            2: "\"سِرِّيًّا؟\" تَمْتَمْتُ، وَأَعَدْتُ تَشْغِيلَ هَاتِفِي لِلْمَرَّةِ المِلْيُونِ. تَجَمَّدَتِ الشَّاشَةُ. بَدَا صَوْتُ مُحَرِّكِ تِلِسْكُوبِي ضَعِيفًا، ثُمَّ مَاتَ. أَخْرَجَ أَبِي رَأْسَهُ مِنَ النَّافِذَةِ، وَفِي يَدِهِ فِنْجَانُ قَهْوَةٍ. قَالَ: \"عَاصِفَةٌ شَمْسِيَّةٌ، رُبَّمَا؟ طَقْسُ الفَضَاءِ يَؤَثِّرُ عَلَى التِّكْنُولُوجِيَا أَحْيَانًا.\"",
+                            3: "رَمَشْتُ. طَقْسُ الفَضَاءِ؟ ظَنَنْتُ أَنَّ هَذَا مُجَرَّدُ شَيْءٍ مِنْ حِصَّةِ العُلُومِ: الاِنْفِجَارَاتُ الشَّمْسِيَّةُ، الاِنْبِعَاثَاتُ الكُتَلِيَّةُ الإِكْلِيلِيَّةُ—ثَوْرَانَاتٌ عِمْلَاقَةٌ مِنَ الشَّمْسِ، تَقْذِفُ البْلَازْمَا وَالطَّاقَةَ عَبْرَ الفَضَاءِ. هَلْ يُمْكِنُ أَنْ يَصِلَ ذَلِكَ إِلَيْنَا حَقًّا هُنَا؟",
+                            4: "سَحَبْتُ تَنْبِيهَ طَقْسِ الفَضَاءِ الخَاصَّ بِوَكَالَةِ نَاسَا. وَمَضَتِ الصَّفْحَةُ: \"اِنْبِعَاثٌ كُتَلِيٌّ إِكْلِيلِيٌّ كَبِيرٌ\". \"عَاصِفَةٌ مَغْنَاطِيسِيَّةٌ أَرْضِيَّةٌ مُحْتَمَلَةٌ اللَّيْلَةَ\". ظَهَرَتْ نَافِذَةٌ مُنْبَثِقَةٌ فِي تَطْبِيقِ الفَلَكِ المُفَضَّلِ لَدَيَّ: \"تَتَبُّعُ الأَقْمَارِ الصِّنَاعِيَّةِ غَيْرُ مُتَّصِلٍ بِالإِنْتَرْنِتِ بِسَبَبِ زِيَادَةِ النَّشَاطِ الشَّمْسِيِّ.\"",
+                            5: "شَرَحَ أَبِي: \"الاِنْبِعَاثَاتُ الكُتَلِيَّةُ الإِكْلِيلِيَّةُ (CME) مِثْلُ الغُيُومِ العِمْلَاقَةِ مِنَ الجُسَيْمَاتِ المَشْحُونَةِ القَادِمَةِ مِنَ الشَّمْسِ. عِنْدَمَا تَصِلُ إِلَى الأَرْضِ، فَإِنَّهَا تُحْدِثُ فَوْضَى فِي خُطُوطِ الكَهْرَبَاءِ، وَنِظَامِ تَحْدِيدِ المَوَاقِعِ العَالَمِيِّ (GPS)، وَحَتَّى التِّلِسْكُوبَاتِ. عَادَةً مَا يَحْمِينَا المَجَالُ المَغْنَاطِيسِيُّ لِلْأَرْضِ، لَكِنَّ اللَّيْلَةَ يَتَعَرَّضُ لِضَرْبَةٍ قَوِيَّةٍ.\"",
+                            6: "رَاسَلْتُ مَجْمُوعَةَ الدَّرْدَشَةِ الخَاصَّةَ بِنَادِي الفَلَكِ. أَجَابَتْ زُوي: \"شَبَكَةُ الوَايْ فَايْ الخَاصَّةُ بِي مُعَطَّلَةٌ. وَتَقُولُ جَيْمِي إِنَّ تِلِسْكُوبَهَا يَتَصَرَّفُ بِغَرَابَةٍ أَيْضًا. هَلْ هَذَا هُوَ السَّبَبُ فِي ظُهُورِ الأَضْوَاءِ الشَّمَالِيَّةِ أَحْيَانًا فِي مَنَاطِقَ أَبْعَدَ جَنُوبًا؟\" اِبْتَسَمْتُ، وَأَنَا أُفَكِّرُ كَيْفَ أَنَّ طَقْسَ الفَضَاءِ لَيْسَ مُجَرَّدَ مَوْضُوعٍ عِلْمِيٍّ—إِنَّهُ شَيْءٌ يَرْبِطُنَا جَمِيعًا.",
+                            7: "بَدَلًا مِنَ الشُّعُورِ بِالهَزِيمَةِ، قَلَّبْتُ خَرَائِطِي النَّجْمِيَّةَ الوَرَقِيَّةَ القَدِيمَةَ وَوَجَدْتُ كَوْكَبَةَ الجَبَّارِ. وَجَّهْتُ تِلِسْكُوبِي يَدَوِيًّا، وَرَسَمْتُ مَا اسْتَطَعْتُ بِاليَدِ. اللَّيْلَةَ، لَمْ تَكُنِ السَّمَاءُ مُجَرَّدَ نُجُومٍ—لَقَدْ كَانَتْ تَذْكِيرًا بِكَيْفَ يُمْكِنُ لِقُوَّةِ الشَّمْسِ أَنْ تَصِلَ عَبْرَ 150 مِلْيُونَ كِيلُومِتْرٍ وَتَلْمُسَ رُكْنِي الصَّغِيرَ عَلَى الأَرْضِ.",
+                            8: "بَيْنَمَا اسْتَمَرَّتِ العَاصِفَةُ المَغْنَاطِيسِيَّةُ الأَرْضِيَّةُ، حَدَّقْتُ فِي السَّمَاءِ. عَلَى الرَّغْمِ مِنْ تَعَطُّلِ تِكْنِيَّتِي، شَعَرْتُ بِاتِّصَالٍ جَدِيدٍ بِالكَوْنِ. فِي مَكَانٍ مَا، رُبَّمَا تَحْتَرِقُ الأَضْوَاءُ الشَّفَقِيَّةُ سَاطِعَةً—وَرُبَّمَا تَكُونُ مَرْئِيَّةً حَتَّى مِنْ مَدِينَتِنَا إِذَا كَانَتِ العَاصِفَةُ الشَّمْسِيَّةُ قَوِيَّةً بِمَا فِيهِ الكِفَايَةُ.",
+                            9: "غَدًا، سَيَعُودُ كُلُّ شَيْءٍ إِلَى طَبِيعَتِهِ—الهَاتِفُ، التِّلِسْكُوبُ، الإِنْتَرْنِتُ. لَكِنَّنِي الآنَ فَهِمْتُ: دِرَاسَةُ النُّجُومِ لَيْسَتْ مُجَرَّدَ نَظَرٍ إِلَى الخَارِجِ. إِنَّهَا تَتَعَلَّقُ بِتَعَلُّمِ كَيْفَ تَتَحَدَّثُ الشَّمْسُ وَالأَرْضُ دَائِمًا مَعًا، تُرْسِلَانِ الإِشَارَاتِ وَالعَوَاصِفَ، وَتَرْبِطَانِ كُلَّ فَلَكِيٍّ تَحْتَ السَّمَاءِ."
+                        }
+                    }
+                };
+
+                const language = isArabic ? 'ar' : 'en';
+                const levelTexts = textContent[selectedLevel];
+                
+                if (levelTexts && levelTexts[language]) {
+                    return levelTexts[language][pageIndex] || '';
+                }
+                
+                // Fallback to young explorers if level not found
+                const fallbackTexts = textContent['curious'][language];
+                return fallbackTexts ? (fallbackTexts[pageIndex] || '') : '';
+            }
+
+            nextPage() {
+                if (this.isAnimating || this.currentPage >= this.totalPages - 1) return;
+                
+                this.isAnimating = true;
+                this.showLoading();
+                
+                const currentPageEl = this.pageContainer.children[this.currentPage];
+                if (currentPageEl) {
+                    currentPageEl.classList.add('prev');
+                }
+                
+                setTimeout(() => {
+                    this.currentPage++;
+                    this.showPage(this.currentPage);
+                    this.updateDisplay();
+                    this.isAnimating = false;
+                }, settings.animationSpeed / 2);
+            }
+
+            previousPage() {
+                if (this.isAnimating || this.currentPage <= 0) return;
+                
+                this.isAnimating = true;
+                this.showLoading();
+                
+                const currentPageEl = this.pageContainer.children[this.currentPage];
+                if (currentPageEl) {
+                    currentPageEl.classList.remove('active');
+                }
+                
+                setTimeout(() => {
+                    this.currentPage--;
+                    this.showPage(this.currentPage);
+                    this.updateDisplay();
+                    this.isAnimating = false;
+                }, settings.animationSpeed / 2);
+            }
+
+            goToPage(pageIndex) {
+                if (this.isAnimating || pageIndex < 0 || pageIndex >= this.totalPages) return;
+                
+                this.isAnimating = true;
+                this.showLoading();
+                
+                setTimeout(() => {
+                    this.currentPage = pageIndex;
+                    this.showPage(this.currentPage);
+                    this.updateDisplay();
+                    this.isAnimating = false;
+                }, settings.animationSpeed / 2);
+            }
+
+            updateDisplay() {
+                // Update button states
+                this.prevBtn.disabled = this.currentPage === 0;
+                this.nextBtn.disabled = this.currentPage === this.totalPages - 1;
+                
+                // Check if Arabic is active for RTL layout
+                const isArabic = document.getElementById('arabicBtn') && document.getElementById('arabicBtn').classList.contains('active');
+                const flipbookContainer = document.querySelector('.flipbook-container');
+                
+                // Apply RTL class for Arabic
+                if (isArabic) {
+                    flipbookContainer.classList.add('rtl');
+                } else {
+                    flipbookContainer.classList.remove('rtl');
+                }
+                
+                // Update button symbols for minimal design
+                if (isArabic) {
+                    this.prevBtn.innerHTML = '<';
+                    this.nextBtn.innerHTML = '>';
+                } else {
+                    this.prevBtn.innerHTML = '<';
+                    this.nextBtn.innerHTML = '>';
+                }
+
+                // Show/hide quiz button on last page
+                if (this.currentPage === this.totalPages - 1) {
+                    this.endOptions.style.display = 'flex';
+                } else {
+                    this.endOptions.style.display = 'none';
+                }
+            }
+
+            goBackToHome() {
+                // Hide flipbook with animation
+                this.flipbook.style.transition = 'opacity 0.5s ease-out';
+                this.flipbook.style.opacity = '0';
+                
+                setTimeout(() => {
+                    this.flipbook.style.display = 'none';
+                    this.flipbook.style.opacity = '1';
+                    this.flipbook.style.transition = '';
+                    
+                    // Show level selection page instead of home page
+                    const levelPage = document.getElementById('levelPage');
+                    levelPage.style.display = 'flex';
+                    levelPage.style.opacity = '0';
+                    levelPage.style.transition = 'opacity 0.5s ease-in';
+                    
+                    setTimeout(() => {
+                        levelPage.style.opacity = '1';
+                        setTimeout(() => {
+                            levelPage.style.transition = '';
+                        }, 500);
+                    }, 50);
+                }, 500);
+                
+                console.log('🏠 Returned to level selection page from flipbook');
+            }
+
+            preloadImages() {
+                // Preload next few images for smoother experience
+                const preloadCount = Math.min(3, this.totalPages);
+                for (let i = 1; i <= preloadCount; i++) {
+                    if (this.currentPage + i < this.totalPages) {
+                        const img = new Image();
+                        img.src = this.bookPages[this.currentPage + i];
+                    }
+                }
+            }
+
+            refreshForLanguageChange() {
+                // Get new pages for current language
+                this.bookPages = getBookPages();
+                this.totalPages = this.bookPages.length;
+                
+                // Recreate pages with new images
+                this.createPages();
+                
+                // Reset to first page
+                this.currentPage = 0;
+                this.updateDisplay(); // This will now handle RTL class application
+                
+                // Preload new images
+                this.preloadImages();
+                
+                console.log(`📖 Flipbook refreshed for language change. New pages:`, this.bookPages);
+            }
+
+            goToQuiz() {
+                // Get the current selected level from the global variable
+                const selectedLevel = window.selectedLevel || 'Young Explorers';
+                
+                // Hide flipbook with animation
+                this.flipbook.style.transition = 'opacity 0.5s ease-out';
+                this.flipbook.style.opacity = '0';
+                
+                setTimeout(() => {
+                    this.flipbook.style.display = 'none';
+                    this.flipbook.style.opacity = '1';
+                    this.flipbook.style.transition = '';
+                    
+                    // Show quiz page directly with the corresponding level
+                    showQuizPage(selectedLevel);
+                }, 500);
+                
+                console.log(`🧩 Navigated to ${selectedLevel} quiz from story completion`);
+            }
+        }
+
+        // ========================================
+        // INITIALIZE THE APPLICATION
+        // ========================================
+        
+        // Wait for the page to load, then start the flipbook
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize home page functionality
+            initializeHomePage();
+            
+            console.log('📖 Flipbook system initialized with level-based pages');
+            console.log('🎯 Ready to display your images!');
+        });
+
+        // ========================================
+        // HOME PAGE FUNCTIONALITY
+        // ========================================
+        
+        function initializeHomePage() {
+            const homePage = document.getElementById('homePage');
+            const flipbook = document.getElementById('flipbook');
+            const readButton = document.getElementById('readButton');
+            const quizButton = document.getElementById('quizButton');
+            const englishBtn = document.getElementById('englishBtn');
+            const arabicBtn = document.getElementById('arabicBtn');
+            
+            // Initialize default language state
+            if (!window.currentLanguage) {
+                window.currentLanguage = 'en'; // Default to English
+                englishBtn.classList.add('active');
+                console.log('🌐 Initialized default language: English');
+            }
+            
+            // Force show home page initially
+            homePage.style.display = 'flex';
+            homePage.style.opacity = '1';
+            homePage.style.visibility = 'visible';
+            flipbook.style.display = 'none';
+            
+            console.log('Home page initialized'); // Debug log
+            console.log('Read button:', readButton); // Debug log
+            console.log('Quiz button:', quizButton); // Debug log
+            
+            // Check if buttons exist
+            if (!readButton) {
+                console.error('Read button not found!');
+                return;
+            }
+            if (!quizButton) {
+                console.error('Quiz button not found!');
+                return;
+            }
+            
+            // Language switching functionality
+            function switchLanguage(lang) {
+                const enTexts = document.querySelectorAll('.btn-text-en, .level-title-en, .level-subtitle-en, .level-name-en, .level-desc-en, .story-title-en, .back-home-en, .book-title-en, .swipe-hint-en, .prev-en, .restart-en, .read-aloud-en, .next-en, .keyboard-hint-en, .back-to-home-en');
+        const arTexts = document.querySelectorAll('.btn-text-ar, .level-title-ar, .level-subtitle-ar, .level-name-ar, .level-desc-ar, .story-title-ar, .back-home-ar, .book-title-ar, .swipe-hint-ar, .prev-ar, .restart-ar, .read-aloud-ar, .next-ar, .keyboard-hint-ar, .back-to-home-ar');
+                
+                // Store the current language globally
+                window.currentLanguage = lang;
+                
+                // Clear all active states first
+                englishBtn.classList.remove('active');
+                arabicBtn.classList.remove('active');
+                
+                if (lang === 'ar') {
+                    // Switch to Arabic
+                    enTexts.forEach(el => el.style.display = 'none');
+                    arTexts.forEach(el => el.style.display = 'inline');
+                    document.body.style.direction = 'rtl';
+                    arabicBtn.classList.add('active');
+                    console.log('🌐 Switched to Arabic language');
+                } else {
+                    // Switch to English
+                    enTexts.forEach(el => el.style.display = 'inline');
+                    arTexts.forEach(el => el.style.display = 'none');
+                    document.body.style.direction = 'ltr';
+                    englishBtn.classList.add('active');
+                    console.log('🌐 Switched to English language');
+                }
+                
+                // Refresh flipbook if it's currently open
+                if (window.flipbookApp && document.getElementById('flipbook').style.display !== 'none') {
+                    window.flipbookApp.refreshForLanguageChange();
+                }
+            }
+            
+            // Language button event listeners
+            englishBtn.addEventListener('click', () => switchLanguage('en'));
+            arabicBtn.addEventListener('click', () => switchLanguage('ar'));
+            
+            // Read button click handler - now goes to level selection
+            readButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Read button clicked'); // Debug log
+                
+                // Hide home page and show level selection
+                homePage.style.transition = 'opacity 0.5s ease-out';
+                homePage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    homePage.style.display = 'none';
+                    showLevelSelection();
+                }, 500);
+            });
+            
+            // Quiz button click handler
+            quizButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Quiz button clicked'); // Debug log
+                
+                // Hide home page with fade out effect
+                homePage.style.transition = 'opacity 0.5s ease-out';
+                homePage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    homePage.style.display = 'none';
+                    showQuizLevelSelection();
+                }, 500);
+            });
+
+            // Explore Space Weather button click handler
+            const exploreButton = document.getElementById('exploreButton');
+            exploreButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Explore Space Weather button clicked'); // Debug log
+                
+                // Hide home page with fade out effect
+                homePage.style.transition = 'opacity 0.5s ease-out';
+                homePage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    homePage.style.display = 'none';
+                    showExploreSpaceWeather();
+                }, 500);
+            });
+            
+            // Add back to home functionality (optional)
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && flipbook.style.display !== 'none') {
+                    goBackToHome();
+                }
+            });
+        }
+        
+        function showQuizLevelSelection() {
+            const quizLevelPage = document.getElementById('quizLevelPage');
+            const quizLevelCards = document.querySelectorAll('.quiz-level-card');
+            
+            // Show quiz level selection page
+            quizLevelPage.style.display = 'flex';
+            quizLevelPage.style.opacity = '0';
+            quizLevelPage.style.transition = 'opacity 0.5s ease-in';
+            
+            setTimeout(() => {
+                quizLevelPage.style.opacity = '1';
+            }, 50);
+            
+            // Add click handlers for quiz level cards
+            quizLevelCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const quizLevel = card.getAttribute('data-quiz-level');
+                    console.log(`Selected quiz level: ${quizLevel}`);
+                    
+                    // Store selected quiz level for future use
+                    window.selectedQuizLevel = quizLevel;
+                    
+                    // Hide quiz level page and show quiz
+                    quizLevelPage.style.transition = 'opacity 0.5s ease-out';
+                    quizLevelPage.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        quizLevelPage.style.display = 'none';
+                        showQuizPage(quizLevel);
+                    }, 500);
+                });
+            });
+
+            // Close button functionality
+            const closeQuizLevelPageBtn = document.getElementById('closeQuizLevelPage');
+            closeQuizLevelPageBtn.addEventListener('click', () => {
+                quizLevelPage.style.transition = 'opacity 0.5s ease-out';
+                quizLevelPage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    quizLevelPage.style.display = 'none';
+                    goBackToHome();
+                }, 500);
+            });
+        }
+
+        function showLevelSelection() {
+            const levelPage = document.getElementById('levelPage');
+            const flipbook = document.getElementById('flipbook');
+            const levelCards = document.querySelectorAll('.level-card');
+            const backToHomeBtn = document.getElementById('backToHomeFromLevel');
+            
+            // Show level selection page
+            levelPage.style.display = 'flex';
+            levelPage.style.opacity = '0';
+            levelPage.style.transition = 'opacity 0.5s ease-in';
+            
+            setTimeout(() => {
+                levelPage.style.opacity = '1';
+            }, 50);
+            
+            // Add click handlers for level cards
+            levelCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const level = card.getAttribute('data-level');
+                    console.log(`Selected level: ${level}`);
+                    console.log(`Current language before flipbook init: ${window.currentLanguage}`);
+                    
+                    // Store selected level for future use
+                    window.selectedLevel = level;
+                    
+                    // Hide level page and show flipbook
+                    levelPage.style.transition = 'opacity 0.5s ease-out';
+                    levelPage.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        levelPage.style.display = 'none';
+                        flipbook.style.display = 'block';
+                        
+                        // Initialize the flipbook application
+                        window.flipbook = new FlipbookApp();
+                        window.flipbookApp = window.flipbook; // Make it accessible for language switching
+                        
+                        // Fade in the flipbook
+                        flipbook.style.opacity = '0';
+                        flipbook.style.transition = 'opacity 0.5s ease-in';
+                        setTimeout(() => {
+                            flipbook.style.opacity = '1';
+                        }, 50);
+                    }, 500);
+                });
+            });
+            
+            // Back to home button
+            backToHomeBtn.addEventListener('click', () => {
+                levelPage.style.transition = 'opacity 0.5s ease-out';
+                levelPage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    levelPage.style.display = 'none';
+                    goBackToHome();
+                }, 500);
+            });
+
+            // Close button functionality
+            const closeLevelPageBtn = document.getElementById('closeLevelPage');
+            closeLevelPageBtn.addEventListener('click', () => {
+                levelPage.style.transition = 'opacity 0.5s ease-out';
+                levelPage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    levelPage.style.display = 'none';
+                    goBackToHome();
+                }, 500);
+            });
+        }
+
+        // Quiz questions database
+        const curiousMindsQuestions = [
+            {
+                question: "What is the main character's name?",
+                questionAr: "ما اسم الشخصية الرئيسية؟",
+                options: ["Sunny", "Sparky", "Flash", "Bright"],
+                optionsAr: ["ساني", "سباركي", "فلاش", "برايت"],
+                correct: 1
+            },
+            {
+                question: "What caused Sparky to fly into space?",
+                questionAr: "ما الذي تسبب في طيران سباركي إلى الفضاء؟",
+                options: ["A rocket launch", "The Sun's sneeze", "A strong wind", "An explosion"],
+                optionsAr: ["إطلاق صاروخ", "عطسة الشمس", "رياح قوية", "انفجار"],
+                correct: 1
+            },
+            {
+                question: "What was Sparky's first stop on the journey?",
+                questionAr: "ما كانت المحطة الأولى لسباركي في الرحلة؟",
+                options: ["Power lines", "Airplanes", "Satellites", "Space station"],
+                optionsAr: ["خطوط الكهرباء", "الطائرات", "الأقمار الصناعية", "محطة الفضاء"],
+                correct: 2
+            },
+            {
+                question: "What happens when space weather affects satellites?",
+                questionAr: "ماذا يحدث عندما يؤثر طقس الفضاء على الأقمار الصناعية؟",
+                options: ["They get faster", "They spin and get dizzy", "They disappear", "They change color"],
+                optionsAr: ["تصبح أسرع", "تدور وتصاب بالدوار", "تختفي", "تغير لونها"],
+                correct: 1
+            },
+            {
+                question: "How did the space station protect the astronauts?",
+                questionAr: "كيف حمت محطة الفضاء رواد الفضاء؟",
+                options: ["It was invisible", "It was super-strong and built for protection", "It moved away quickly", "It had a magic shield"],
+                optionsAr: ["كانت غير مرئية", "كانت قوية جداً ومبنية للحماية", "تحركت بعيداً بسرعة", "كان لديها درع سحري"],
+                correct: 1
+            },
+            {
+                question: "What beautiful light show did Sparky create at the end?",
+                questionAr: "ما العرض الضوئي الجميل الذي أنشأه سباركي في النهاية؟",
+                options: ["Lightning", "Rainbow", "Aurora", "Fireworks"],
+                optionsAr: ["البرق", "قوس قزح", "الشفق القطبي", "الألعاب النارية"],
+                correct: 2
+            },
+            {
+                question: "Why couldn't Sparky get inside the space station?",
+                questionAr: "لماذا لم يستطع سباركي الدخول إلى محطة الفضاء؟",
+                options: ["The door was locked", "It was too small", "It was designed to keep space weather out", "The astronauts were sleeping"],
+                optionsAr: ["كان الباب مقفلاً", "كانت صغيرة جداً", "كانت مصممة لإبعاد طقس الفضاء", "كان رواد الفضاء نائمين"],
+                correct: 2
+            },
+            {
+                question: "What did Farmer Fran do when her tractor's GPS stopped working?",
+                questionAr: "ماذا فعلت المزارعة فران عندما توقف نظام تحديد المواقع في جرارها؟",
+                options: ["Called for help", "Stopped working", "Steered herself", "Got angry"],
+                optionsAr: ["طلبت المساعدة", "توقفت عن العمل", "قادت بنفسها", "غضبت"],
+                correct: 2
+            },
+            {
+                question: "Which of these shows how humans prepare for space weather?",
+                questionAr: "أي من هذه يُظهر كيف يستعد البشر لطقس الفضاء؟",
+                options: ["Building strong space stations", "Training workers to fix problems", "Having backup systems", "All of the above"],
+                optionsAr: ["بناء محطات فضاء قوية", "تدريب العمال لحل المشاكل", "وجود أنظمة احتياطية", "كل ما سبق"],
+                correct: 3
+            },
+            {
+                question: "If you were a scientist and saw satellites wobbling, what would you do?",
+                questionAr: "إذا كنت عالماً ورأيت أقماراً صناعية تتمايل، ماذا ستفعل؟",
+                options: ["Ignore it", "Send a signal to help fix them", "Turn them off", "Wait and see"],
+                optionsAr: ["تجاهلها", "إرسال إشارة لمساعدتها في الإصلاح", "إطفاؤها", "الانتظار والمراقبة"],
+                correct: 1
+            },
+            {
+                question: "What does this story teach us about space weather?",
+                questionAr: "ماذا تعلمنا هذه القصة عن طقس الفضاء؟",
+                options: ["It only affects the Sun", "It can impact technology on Earth", "It's always dangerous", "It only happens at night"],
+                optionsAr: ["يؤثر فقط على الشمس", "يمكن أن يؤثر على التكنولوجيا على الأرض", "إنه خطير دائماً", "يحدث فقط في الليل"],
+                correct: 1
+            },
+            {
+                question: "How are the people in the story (scientist, worker, pilot, farmer) similar?",
+                questionAr: "كيف يتشابه الأشخاص في القصة (العالم، العامل، الطيار، المزارع)؟",
+                options: ["They all live in space", "They all know how to handle problems", "They all have the same job", "They all met Sparky"],
+                optionsAr: ["كلهم يعيشون في الفضاء", "كلهم يعرفون كيفية التعامل مع المشاكل", "كلهم لديهم نفس الوظيفة", "كلهم التقوا بسباركي"],
+                correct: 1
+            }
+        ];
+
+        const brightSeekersQuestions = [
+            {
+                question: "What is Celeste's main hobby that she does every clear night?",
+                questionAr: "ما هو هواية سيليست الرئيسية التي تمارسها كل ليلة صافية؟",
+                options: ["Reading books", "Setting up her telescope", "Playing video games", "Drawing pictures"],
+                optionsAr: ["قراءة الكتب", "إعداد تلسكوبها", "لعب ألعاب الفيديو", "رسم الصور"],
+                correct: 1
+            },
+            {
+                question: "What problems did Celeste experience with her technology during the story?",
+                questionAr: "ما المشاكل التي واجهتها سيليست مع تقنيتها أثناء القصة؟",
+                options: ["Only her phone stopped working", "Her telescope camera flickered and star map app crashed", "Her computer broke", "The internet was slow"],
+                optionsAr: ["هاتفها فقط توقف عن العمل", "كاميرا تلسكوبها ترمش وتطبيق خريطة النجوم تعطل", "حاسوبها تعطل", "الإنترنت كان بطيئاً"],
+                correct: 1
+            },
+            {
+                question: "What did Celeste discover was causing her technology problems?",
+                questionAr: "ما الذي اكتشفت سيليست أنه يسبب مشاكل تقنيتها؟",
+                options: ["A power outage", "Space weather from a solar storm", "A broken internet connection", "Old equipment"],
+                optionsAr: ["انقطاع في الكهرباء", "طقس الفضاء من عاصفة شمسية", "اتصال إنترنت معطل", "معدات قديمة"],
+                correct: 1
+            },
+            {
+                question: "What is a Coronal Mass Ejection (CME) according to Celeste's father?",
+                questionAr: "ما هو الانبعاث الكتلي الإكليلي حسب والد سيليست؟",
+                options: ["A type of star", "Giant clouds of charged particles from the Sun", "A new planet", "A broken satellite"],
+                optionsAr: ["نوع من النجوم", "غيوم عملاقة من الجسيمات المشحونة من الشمس", "كوكب جديد", "قمر صناعي معطل"],
+                correct: 1
+            },
+            {
+                question: "How did Celeste adapt when her digital technology stopped working?",
+                questionAr: "كيف تكيفت سيليست عندما توقفت تقنيتها الرقمية عن العمل؟",
+                options: ["She gave up stargazing", "She used old paper star charts and guided her telescope manually", "She went to sleep", "She called for help"],
+                optionsAr: ["تخلت عن مراقبة النجوم", "استخدمت خرائط النجوم الورقية القديمة ووجهت تلسكوبها يدوياً", "ذهبت للنوم", "طلبت المساعدة"],
+                correct: 1
+            },
+            {
+                question: "What constellation did Celeste find using her paper star charts?",
+                questionAr: "أي كوكبة وجدت سيليست باستخدام خرائط النجوم الورقية؟",
+                options: ["The Big Dipper", "Orion", "Cassiopeia", "Ursa Major"],
+                optionsAr: ["الدب الأكبر", "الجبار", "ذات الكرسي", "الدبة الكبرى"],
+                correct: 1
+            },
+            {
+                question: "What beautiful phenomenon might be visible during strong solar storms?",
+                questionAr: "ما الظاهرة الجميلة التي قد تكون مرئية أثناء العواصف الشمسية القوية؟",
+                options: ["Shooting stars", "Auroras (Northern/Southern Lights)", "Comets", "Solar eclipses"],
+                optionsAr: ["الشهب", "الشفق القطبي", "المذنبات", "كسوف الشمس"],
+                correct: 1
+            },
+            {
+                question: "What did Celeste learn about the relationship between the Sun and Earth?",
+                questionAr: "ماذا تعلمت سيليست عن العلاقة بين الشمس والأرض؟",
+                options: ["They are completely separate", "The Sun and Earth are always in conversation, sending signals and storms", "The Earth controls the Sun", "They only interact during eclipses"],
+                optionsAr: ["هما منفصلان تماماً", "الشمس والأرض في محادثة دائمة، ترسلان إشارات وعواصف", "الأرض تتحكم في الشمس", "يتفاعلان فقط أثناء الكسوف"],
+                correct: 1
+            },
+            {
+                question: "How far does the Sun's power reach according to Celeste's story?",
+                questionAr: "إلى أي مدى تصل قوة الشمس حسب قصة سيليست؟",
+                options: ["Only to the Moon", "150 million kilometers to Earth", "Just to nearby planets", "Only during the day"],
+                optionsAr: ["فقط إلى القمر", "١٥٠ مليون كيلومتر إلى الأرض", "فقط إلى الكواكب القريبة", "فقط أثناء النهار"],
+                correct: 1
+            },
+            {
+                question: "What was Celeste's main realization at the end of her experience?",
+                questionAr: "ما كان الإدراك الرئيسي لسيليست في نهاية تجربتها؟",
+                options: ["Technology is unreliable", "Studying stars isn't just about looking out, but learning how we're connected to the cosmos", "Paper charts are better than digital", "Solar storms are dangerous"],
+                optionsAr: ["التكنولوجيا غير موثوقة", "دراسة النجوم ليست فقط عن النظر للخارج، بل تعلم كيف نحن متصلون بالكون", "الخرائط الورقية أفضل من الرقمية", "العواصف الشمسية خطيرة"],
+                correct: 1
+            }
+        ];
+
+        
+
+        function showQuizPage(selectedLevel = 'curious') {
+            // Get current language
+            const isArabic = document.getElementById('arabicBtn').classList.contains('active');
+            
+            // Define different question sets for different levels
+            let questionsToUse = [];
+            let questionCount = 5;
+            let quizTitle = '';
+            let quizTitleAr = '';
+            
+            switch(selectedLevel) {
+                case 'curious':
+                    questionsToUse = curiousMindsQuestions || quizQuestions; // Use level-specific questions
+                    questionCount = 5;
+                    quizTitle = 'Young Explorers Quiz';
+                    quizTitleAr = 'اختبار المستكشفين الصغار';
+                    break;
+                case 'seekers':
+                    questionsToUse = brightSeekersQuestions || quizQuestions; // Use level-specific questions
+                    questionCount = 7;
+                    quizTitle = 'Senior Explorers Quiz';
+                    quizTitleAr = 'اختبار المستكشفين الكبار';
+                    break;
+                default:
+                    questionsToUse = curiousMindsQuestions || quizQuestions;
+                    questionCount = 5;
+                    quizTitle = 'Young Explorers Quiz';
+                    quizTitleAr = 'اختبار المستكشفين الصغار';
+            }
+            
+            // Select random questions based on level
+            const selectedQuestions = getRandomQuestions(questionCount, questionsToUse);
+            let currentQuestion = 0;
+            let score = 0;
+            let userAnswers = [];
+
+            // Create quiz page HTML
+            const quizHTML = `
+                <div id="quizPage" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: linear-gradient(135deg, rgba(30, 60, 114, 0.8) 0%, rgba(42, 82, 152, 0.8) 100%);
+                    backdrop-filter: blur(15px);
+                    -webkit-backdrop-filter: blur(15px);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1001;
+                    color: white;
+                    text-align: center;
+                    font-family: 'Arial', sans-serif;
+                    direction: ${isArabic ? 'rtl' : 'ltr'};
+                    overflow-y: auto;
+                ">
+                    <div id="quizContainer" style="
+                        background: rgba(255, 255, 255, 0.1);
+                        backdrop-filter: blur(10px);
+                        border-radius: 20px;
+                        padding: 40px;
+                        max-width: 800px;
+                        width: 90%;
+                        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                    ">
+                        <h1 style="font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                            🧠 ${isArabic ? quizTitleAr : quizTitle}
+                        </h1>
+                        <div id="progressBar" style="
+                            width: 100%;
+                            height: 8px;
+                            background: rgba(255, 255, 255, 0.2);
+                            border-radius: 4px;
+                            margin: 20px 0;
+                            overflow: hidden;
+                        ">
+                            <div id="progress" style="
+                                width: 0%;
+                                height: 100%;
+                                background: linear-gradient(90deg, #ffa366, #ff6b6b);
+                                border-radius: 4px;
+                                transition: width 0.3s ease;
+                            "></div>
+                        </div>
+                        <div id="questionCounter" style="font-size: 1.2em; margin-bottom: 30px; opacity: 0.8;">
+                            ${isArabic ? 'السؤال' : 'Question'} <span id="currentQ">1</span> ${isArabic ? 'من' : 'of'} ${questionCount}
+                        </div>
+                        <div id="quizContent"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Add quiz page to body
+            document.body.insertAdjacentHTML('beforeend', quizHTML);
+            
+            // Show first question
+            showQuestion();
+            
+            function getRandomQuestions(count, questionPool) {
+                const shuffled = [...questionPool].sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count);
+            }
+            
+            function showQuestion() {
+                const question = selectedQuestions[currentQuestion];
+                const questionText = isArabic ? question.questionAr : question.question;
+                const options = isArabic ? question.optionsAr : question.options;
+                
+                const quizContent = document.getElementById('quizContent');
+                quizContent.innerHTML = `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="font-size: 1.8em; margin-bottom: 30px; line-height: 1.4;">
+                            ${questionText}
+                        </h2>
+                        <div id="optionsContainer" style="display: grid; gap: 15px; max-width: 600px; margin: 0 auto;">
+                            ${options.map((option, index) => `
+                                <button class="quiz-option" data-index="${index}" style="
+                                    background: rgba(255, 255, 255, 0.1);
+                                    border: 2px solid rgba(255, 255, 255, 0.3);
+                                    color: white;
+                                    padding: 15px 20px;
+                                    border-radius: 12px;
+                                    font-size: 1.1em;
+                                    cursor: pointer;
+                                    transition: all 0.3s ease;
+                                    text-align: ${isArabic ? 'right' : 'left'};
+                                " onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.borderColor='rgba(255, 255, 255, 0.5)'" 
+                                   onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.3)'">
+                                    ${String.fromCharCode(65 + index)}) ${option}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                // Update progress
+                const progress = ((currentQuestion) / questionCount) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+                document.getElementById('currentQ').textContent = currentQuestion + 1;
+                
+                // Add click handlers to options
+                document.querySelectorAll('.quiz-option').forEach(option => {
+                    option.addEventListener('click', () => selectAnswer(parseInt(option.dataset.index)));
+                });
+            }
+            
+            function selectAnswer(selectedIndex) {
+                const question = selectedQuestions[currentQuestion];
+                const isCorrect = selectedIndex === question.correct;
+                
+                userAnswers.push({
+                    question: currentQuestion,
+                    selected: selectedIndex,
+                    correct: question.correct,
+                    isCorrect: isCorrect
+                });
+                
+                if (isCorrect) {
+                    score++;
+                }
+                
+                // Show feedback
+                showFeedback(selectedIndex, question.correct);
+                
+                setTimeout(() => {
+                    currentQuestion++;
+                    if (currentQuestion < questionCount) {
+                        showQuestion();
+                    } else {
+                        showResults();
+                    }
+                }, 1500);
+            }
+            
+            function showFeedback(selected, correct) {
+                const options = document.querySelectorAll('.quiz-option');
+                options.forEach((option, index) => {
+                    option.style.pointerEvents = 'none';
+                    if (index === correct) {
+                        option.style.background = 'rgba(76, 175, 80, 0.8)';
+                        option.style.borderColor = '#4CAF50';
+                    } else if (index === selected && selected !== correct) {
+                        option.style.background = 'rgba(244, 67, 54, 0.8)';
+                        option.style.borderColor = '#f44336';
+                    }
+                });
+            }
+            
+            function showResults() {
+                const percentage = Math.round((score / questionCount) * 100);
+                let message, messageAr, emoji;
+                
+                if (percentage >= 80) {
+                    message = "Excellent! You're a space weather expert! 🌟";
+                    messageAr = "ممتاز! أنت خبير في طقس الفضاء! 🌟";
+                    emoji = "🏆";
+                } else if (percentage >= 60) {
+                    message = "Great job! You understand the story well! 👏";
+                    messageAr = "عمل رائع! أنت تفهم القصة جيداً! 👏";
+                    emoji = "🎉";
+                } else {
+                    message = "Good try! Read the story again to learn more! 📚";
+                    messageAr = "محاولة جيدة! اقرأ القصة مرة أخرى لتتعلم أكثر! 📚";
+                    emoji = "📖";
+                }
+                
+                const quizContent = document.getElementById('quizContent');
+                quizContent.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 4em; margin-bottom: 20px;">${emoji}</div>
+                        <h2 style="font-size: 2.5em; margin-bottom: 20px;">
+                            ${isArabic ? 'النتائج' : 'Results'}
+                        </h2>
+                        <div style="font-size: 3em; margin-bottom: 20px; color: #ffa366;">
+                            ${score}/${questionCount} (${percentage}%)
+                        </div>
+                        <p style="font-size: 1.4em; margin-bottom: 30px; line-height: 1.5;">
+                            ${isArabic ? messageAr : message}
+                        </p>
+                        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                            <button id="retakeQuiz" style="
+                                background: linear-gradient(45deg, #ffa366, #ff6b6b);
+                                color: white;
+                                border: none;
+                                padding: 15px 30px;
+                                font-size: 1.2em;
+                                font-weight: bold;
+                                border-radius: 25px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 6px 20px rgba(255, 168, 102, 0.4);
+                            ">${isArabic ? '🔄 إعادة الاختبار' : '🔄 Retake Quiz'}</button>
+                            <button id="backToQuizLevels" style="
+                                background: linear-gradient(45deg, #6b73ff, #9b59b6);
+                                color: white;
+                                border: none;
+                                padding: 15px 30px;
+                                font-size: 1.2em;
+                                font-weight: bold;
+                                border-radius: 25px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 6px 20px rgba(107, 115, 255, 0.4);
+                            ">${isArabic ? '📚 مستويات أخرى' : '📚 Other Levels'}</button>
+                            <button id="backToHomeFromQuiz" style="
+                                background: linear-gradient(45deg, var(--primary), var(--accent));
+                                color: var(--text);
+                                border: none;
+                                padding: 15px 30px;
+                                font-size: 1.2em;
+                                font-weight: bold;
+                                border-radius: 25px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 6px 20px rgba(255, 168, 102, 0.4);
+                            ">${isArabic ? '🏠 العودة للرئيسية' : '🏠 Back to Home'}</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Update progress to 100%
+                document.getElementById('progress').style.width = '100%';
+                document.getElementById('currentQ').textContent = questionCount;
+                
+                // Add event listeners
+                document.getElementById('retakeQuiz').addEventListener('click', () => {
+                    document.getElementById('quizPage').remove();
+                    showQuizPage(selectedLevel);
+                });
+                
+                document.getElementById('backToQuizLevels').addEventListener('click', () => {
+                    document.getElementById('quizPage').remove();
+                    showQuizLevelSelection();
+                });
+                
+                document.getElementById('backToHomeFromQuiz').addEventListener('click', () => {
+                    const quizPage = document.getElementById('quizPage');
+                    quizPage.style.transition = 'opacity 0.5s ease-out';
+                    quizPage.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        quizPage.remove();
+                        goBackToHome();
+                    }, 500);
+                });
+            }
+            
+            // Fade in quiz page
+            const quizPage = document.getElementById('quizPage');
+            quizPage.style.opacity = '0';
+            quizPage.style.transition = 'opacity 0.5s ease-in';
+            setTimeout(() => {
+                quizPage.style.opacity = '1';
+            }, 50);
+        }
+
+        function showExploreSpaceWeather() {
+            // Get current language
+            const isArabic = document.getElementById('arabicBtn').classList.contains('active');
+            
+            // Create explore space weather page HTML with bilingual content
+            const exploreHTML = `
+                <div id="explorePage" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    align-items: center;
+                    z-index: 1001;
+                    color: var(--text);
+                    text-align: center;
+                    font-family: 'Arial', sans-serif;
+                    direction: ${isArabic ? 'rtl' : 'ltr'};
+                    overflow-y: auto;
+                    padding: 20px;
+                ">
+                    <div style="max-width: 900px; width: 100%;">
+                        <h1 style="font-size: 3.5em; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); color: var(--text);">
+                            ${isArabic ? '🌌 استكشف طقس الفضاء الان' : '🌌 Explore Live Space Weather'}
+                        </h1>
+                        
+                        <!-- Live Space Weather Widget -->
+                        <div id="spaceWeatherWidget" style="
+                            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+                            border-radius: 20px;
+                            padding: 30px;
+                            margin: 30px 0;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                            border: 3px solid rgba(255,255,255,0.2);
+                        ">
+                            <h2 style="font-size: 2.5em; margin-bottom: 25px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                                ☀️ ${isArabic ? 'طقس الفضاء اليوم' : "Today's Space Weather"}
+                            </h2>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                                <!-- Solar Wind -->
+                                <div id="solarWindCard" style="
+                                    background: var(--secondary);
+                                    border-radius: 15px;
+                                    padding: 20px;
+                                    backdrop-filter: blur(10px);
+                                    border: 2px solid var(--accent);
+                                ">
+                                    <h3 style="font-size: 1.8em; margin-bottom: 15px; color: var(--text);">
+                                        🌬️ ${isArabic ? 'الرياح الشمسية' : 'Solar Wind'}
+                                    </h3>
+                                    <div id="solarWindStatus" style="font-size: 2.5em; margin: 10px 0;">🔄</div>
+                                    <p id="solarWindText" style="font-size: 1.3em; font-weight: bold; color: var(--text);">
+                                        ${isArabic ? 'جاري التحميل...' : 'Loading...'}
+                                    </p>
+                                </div>
+                                
+                                <!-- Solar Flares -->
+                                <div id="solarFlareCard" style="
+                                    background: var(--secondary);
+                                    border-radius: 15px;
+                                    padding: 20px;
+                                    backdrop-filter: blur(10px);
+                                    border: 2px solid var(--accent);
+                                ">
+                                    <h3 style="font-size: 1.8em; margin-bottom: 15px; color: var(--text);">
+                                        ⚡ ${isArabic ? 'التوهجات الشمسية' : 'Solar Flares'}
+                                    </h3>
+                                    <div id="solarFlareStatus" style="font-size: 2.5em; margin: 10px 0;">🔄</div>
+                                    <p id="solarFlareText" style="font-size: 1.3em; font-weight: bold; color: var(--text);">
+                                        ${isArabic ? 'جاري التحميل...' : 'Loading...'}
+                                    </p>
+                                </div>
+                                
+                                <!-- CME -->
+                                <div id="cmeCard" style="
+                                    background: var(--secondary);
+                                    border-radius: 15px;
+                                    padding: 20px;
+                                    backdrop-filter: blur(10px);
+                                    border: 2px solid var(--accent);
+                                ">
+                                    <h3 style="font-size: 1.8em; margin-bottom: 15px; color: var(--text);">
+                                        💨 ${isArabic ? 'انبعاثات الكتلة الإكليلية' : 'Coronal Mass Ejections (CME)'}
+                                    </h3>
+                                    <div id="cmeStatus" style="font-size: 2.5em; margin: 10px 0;">🔄</div>
+                                    <p id="cmeText" style="font-size: 1.3em; font-weight: bold; color: var(--text);">
+                                        ${isArabic ? 'جاري التحميل...' : 'Loading...'}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <p style="font-size: 1.1em; opacity: 0.8; margin-top: 20px; color: var(--text);">
+                                ${isArabic ? '🔄 يتم التحديث كل 5 دقائق' : '🔄 Updates every 5 minutes'}
+                            </p>
+                        </div>
+                        
+                        <button id="backToHomeFromExplore" style="
+                            background: var(--secondary);
+                            color: var(--text);
+                            border: 2px solid var(--primary);
+                            padding: 15px 30px;
+                            font-size: 1.1em;
+                            font-weight: 500;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            backdrop-filter: blur(10px);
+                        ">${isArabic ? 'العودة للرئيسية' : 'Back to Home'}</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add explore page to body
+            document.body.insertAdjacentHTML('beforeend', exploreHTML);
+            
+            // Initialize space weather widget
+            initSpaceWeatherWidget();
+            
+            // Add back to home functionality
+            document.getElementById('backToHomeFromExplore').addEventListener('click', () => {
+                const explorePage = document.getElementById('explorePage');
+                explorePage.style.transition = 'opacity 0.5s ease-out';
+                explorePage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    explorePage.remove();
+                    // Clear the update interval when leaving the page
+                    if (window.spaceWeatherInterval) {
+                        clearInterval(window.spaceWeatherInterval);
+                    }
+                    goBackToHome();
+                }, 500);
+            });
+            
+            // Fade in explore page
+            const explorePage = document.getElementById('explorePage');
+            explorePage.style.opacity = '0';
+            explorePage.style.transition = 'opacity 0.5s ease-in';
+            setTimeout(() => {
+                explorePage.style.opacity = '1';
+            }, 50);
+        }
+        
+        function goBackToHome() {
+            const homePage = document.getElementById('homePage');
+            const flipbook = document.getElementById('flipbook');
+            
+            flipbook.style.transition = 'opacity 0.5s ease-out';
+            flipbook.style.opacity = '0';
+            
+            setTimeout(() => {
+                flipbook.style.display = 'none';
+                homePage.style.display = 'flex';
+                homePage.style.opacity = '0';
+                homePage.style.transition = 'opacity 0.5s ease-in';
+                setTimeout(() => {
+                    homePage.style.opacity = '1';
+                }, 50);
+            }, 500);
+        }
+
+        
+        // ========================================
+        // LIVE SPACE WEATHER WIDGET
+        // ========================================
+        
+        function initSpaceWeatherWidget() {
+            // Fetch initial data
+            updateSpaceWeatherData();
+            
+            // Set up auto-refresh every 5 minutes (300,000 milliseconds)
+            window.spaceWeatherInterval = setInterval(updateSpaceWeatherData, 300000);
+        }
+        
+        async function updateSpaceWeatherData() {
+            const isArabic = document.getElementById('arabicBtn').classList.contains('active');
+            
+            try {
+                // Show loading state
+                showLoadingState(isArabic);
+                
+                // Fetch all three data sources concurrently with timeout
+                const [solarWindData, solarFlareData, cmeData] = await Promise.allSettled([
+                    fetchWithTimeout(fetchSolarWind(), 10000),
+                    fetchWithTimeout(fetchSolarFlares(), 10000),
+                    fetchWithTimeout(fetchCME(), 10000)
+                ]);
+                
+                // Update Solar Wind
+                if (solarWindData.status === 'fulfilled') {
+                    updateSolarWindDisplay(solarWindData.value, isArabic);
+                } else {
+                    updateSolarWindDisplay(getMockSolarWindData(), isArabic);
+                }
+                
+                // Update Solar Flares
+                if (solarFlareData.status === 'fulfilled') {
+                    updateSolarFlareDisplay(solarFlareData.value, isArabic);
+                } else {
+                    updateSolarFlareDisplay(getMockSolarFlareData(), isArabic);
+                }
+                
+                // Update CME
+                if (cmeData.status === 'fulfilled') {
+                    updateCMEDisplay(cmeData.value, isArabic);
+                } else {
+                    updateCMEDisplay(getMockCMEData(), isArabic);
+                }
+                
+            } catch (error) {
+                console.error('Error fetching space weather data:', error);
+                // Use mock data as fallback
+                updateSolarWindDisplay(getMockSolarWindData(), isArabic);
+                updateSolarFlareDisplay(getMockSolarFlareData(), isArabic);
+                updateCMEDisplay(getMockCMEData(), isArabic);
+            }
+        }
+        
+        // Helper function to add timeout to fetch requests
+        function fetchWithTimeout(promise, timeout) {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Request timeout')), timeout)
+                )
+            ]);
+        }
+        
+        // Mock data functions for fallback
+        function getMockSolarWindData() {
+            return { speed: 350 + Math.random() * 200 }; // Random speed between 350-550 km/s
+        }
+        
+        function getMockSolarFlareData() {
+            return { 
+                maxFlux: Math.random() * 1e-5, 
+                recentCount: Math.floor(Math.random() * 5) 
+            };
+        }
+        
+        function getMockCMEData() {
+            return { 
+                count: Math.random() > 0.7 ? 1 : 0, 
+                events: [] 
+            };
+        }
+        
+        function showLoadingState(isArabic) {
+            const elements = ['solarWindStatus', 'solarFlareStatus', 'cmeStatus'];
+            const textElements = ['solarWindText', 'solarFlareText', 'cmeText'];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = '🔄';
+            });
+            
+            textElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = isArabic ? 
+                        'جاري التحميل...' : 
+                        'Loading...';
+                }
+            });
+        }
+        
+        async function fetchSolarWind() {
+            try {
+                const response = await fetch('https://services.swpc.noaa.gov/products/solar-wind/mag-1-day.json');
+                if (!response.ok) throw new Error('Solar wind data fetch failed');
+                const data = await response.json();
+                
+                // Get the latest data point (last entry in array)
+                const latest = data[data.length - 1];
+                const speed = parseFloat(latest[6]); // Speed is in column 6
+                
+                return { speed };
+            } catch (error) {
+                console.warn('Solar wind API failed, using mock data:', error);
+                throw error;
+            }
+        }
+        
+        async function fetchSolarFlares() {
+            try {
+                const response = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xrays-1-day.json');
+                if (!response.ok) throw new Error('Solar flare data fetch failed');
+                const data = await response.json();
+                
+                // Get recent flare activity (last few hours)
+                const now = new Date();
+                const sixHoursAgo = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+                
+                const recentFlares = data.filter(entry => {
+                    const entryTime = new Date(entry.time_tag);
+                    return entryTime > sixHoursAgo;
+                });
+                
+                // Find the highest flux level in recent data
+                let maxFlux = 0;
+                recentFlares.forEach(entry => {
+                    const flux = parseFloat(entry.flux);
+                    if (flux > maxFlux) maxFlux = flux;
+                });
+                
+                return { maxFlux, recentCount: recentFlares.length };
+            } catch (error) {
+                console.warn('Solar flare API failed, using mock data:', error);
+                throw error;
+            }
+        }
+        
+        async function fetchCME() {
+            try {
+                // Using NASA DONKI API with demo key - replace with your actual API key
+                const apiKey = 'DEMO_KEY'; // Replace with your NASA API key
+                const today = new Date().toISOString().split('T')[0];
+                const response = await fetch(`https://api.nasa.gov/DONKI/CME?startDate=${today}&api_key=${apiKey}`);
+                
+                if (!response.ok) throw new Error('CME data fetch failed');
+                const data = await response.json();
+                
+                return { count: data.length, events: data };
+            } catch (error) {
+                console.warn('CME API failed, using mock data:', error);
+                throw error;
+            }
+        }
+        
+        function updateSolarWindDisplay(data, isArabic) {
+            const statusElement = document.getElementById('solarWindStatus');
+            const textElement = document.getElementById('solarWindText');
+            
+            if (!statusElement || !textElement) return;
+            
+            const speed = data.speed;
+            let emoji, status, statusAr;
+            
+            if (speed < 400) {
+                emoji = '🟢';
+                status = 'Calm';
+                statusAr = 'هادئ';
+            } else if (speed < 600) {
+                emoji = '🟡';
+                status = 'Breezy';
+                statusAr = 'معتدل';
+            } else {
+                emoji = '🔴';
+                status = 'Stormy';
+                statusAr = 'عاصف';
+            }
+            
+            statusElement.textContent = emoji;
+            textElement.textContent = isArabic ? 
+                `${statusAr} (${Math.round(speed)} كم/ث)` : 
+                `${status} (${Math.round(speed)} km/s)`;
+        }
+        
+        function updateSolarFlareDisplay(data, isArabic) {
+            const statusElement = document.getElementById('solarFlareStatus');
+            const textElement = document.getElementById('solarFlareText');
+            
+            if (!statusElement || !textElement) return;
+            
+            const maxFlux = data.maxFlux;
+            let emoji, status, statusAr;
+            
+            if (maxFlux < 1e-6) {
+                emoji = '🌟';
+                status = 'Small Flare';
+                statusAr = 'توهج صغير';
+            } else if (maxFlux < 1e-5) {
+                emoji = '⚡';
+                status = 'Strong Flare';
+                statusAr = 'توهج قوي';
+            } else {
+                emoji = '🌞';
+                status = 'Giant Flare';
+                statusAr = 'توهج عملاق';
+            }
+            
+            statusElement.textContent = emoji;
+            textElement.textContent = isArabic ? statusAr : status;
+        }
+        
+        function updateCMEDisplay(data, isArabic) {
+            const statusElement = document.getElementById('cmeStatus');
+            const textElement = document.getElementById('cmeText');
+            
+            if (!statusElement || !textElement) return;
+            
+            if (data.count > 0) {
+                statusElement.textContent = '💨';
+                textElement.textContent = isArabic ? 
+                    'الشمس أطلقت بلازما!' : 
+                    'Sun burped plasma!';
+            } else {
+                statusElement.textContent = '✅';
+                textElement.textContent = isArabic ? 
+                    'لا توجد انبعاثات اليوم' : 
+                    'No CME today';
+            }
+        }
+        
+        function showErrorState(isArabic) {
+            const elements = ['solarWindStatus', 'solarFlareStatus', 'cmeStatus'];
+            const textElements = ['solarWindText', 'solarFlareText', 'cmeText'];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = '❌';
+            });
+            
+            textElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = isArabic ? 
+                        'خطأ في التحميل' : 
+                        'Loading Error';
+                }
+            });
+        }
+
+        // ========================================
+        // UTILITY FUNCTIONS FOR CUSTOMIZATION
+        // ========================================
+        
+        // Function to add a new page (call from browser console if needed)
+        function addPage(imageSrc) {
+            const selectedLevel = window.selectedLevel || 'curious';
+            const currentLanguage = window.currentLanguage || 'en';
+            
+            // Add to the appropriate level and language array
+            if (levelPages[selectedLevel] && levelPages[selectedLevel][currentLanguage]) {
+                levelPages[selectedLevel][currentLanguage].push(imageSrc);
+            }
+            
+            if (window.flipbook) {
+                const currentBookPages = getBookPages();
+                window.flipbook.bookPages = currentBookPages;
+                window.flipbook.totalPages = currentBookPages.length;
+                window.flipbook.createPages();
+                window.flipbook.updateDisplay();
+            }
+        }
+
+        // Function to change book title (call from browser console if needed)
+        function changeTitle(newTitle) {
+            document.querySelector('.book-title').textContent = newTitle;
+        }
+    </script>
+</body>
+</html>
