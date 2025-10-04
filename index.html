@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffa866">
+    <meta name="apple-mobile-web-app-title" content="Interactive Flipbook">
     <title>Interactive Flipbook</title>
     <style>
         :root {
@@ -788,6 +793,57 @@
         @media (max-width: 768px) {
             body {
                 padding: 10px;
+                overflow-x: hidden;
+            }
+
+            .home-page {
+                padding: 20px 10px;
+            }
+
+            .home-title {
+                font-size: 2.5em;
+            }
+
+            .home-subtitle {
+                font-size: 1.1em;
+            }
+
+            .nav-button {
+                padding: 15px 25px;
+                font-size: 1.2em;
+                min-width: 150px;
+                height: 55px;
+            }
+
+            .button-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .language-selector {
+                top: 15px;
+                right: 15px;
+            }
+
+            .language-btn {
+                padding: 12px 20px;
+                font-size: 1em;
+                min-width: 70px;
+                height: 45px;
+            }
+
+            .level-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .level-card, .quiz-level-card {
+                min-width: 280px;
+                padding: 25px 20px;
+            }
+
+            .level-title {
+                font-size: 2.2em;
             }
 
             .page-display {
@@ -798,6 +854,7 @@
             .controls {
                 flex-direction: column;
                 text-align: center;
+                padding: 20px;
             }
 
             .nav-buttons {
@@ -808,10 +865,31 @@
             .btn {
                 flex: 1;
                 max-width: 120px;
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .btn.side-nav {
+                padding: 12px 15px;
+                min-width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
 
             .book-title {
                 font-size: 1.2em;
+            }
+
+            .book-header {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .book-header .back-to-home-btn,
+            .read-aloud-header-btn {
+                padding: 6px 12px;
+                font-size: 0.8em;
             }
 
             .fullscreen-btn {
@@ -819,9 +897,78 @@
                 transform: none;
                 margin-top: 10px;
             }
+
+            /* Quiz mobile styles */
+            #quizContainer {
+                padding: 30px 20px !important;
+                margin: 10px !important;
+                max-width: 95% !important;
+            }
+
+            .quiz-option {
+                padding: 15px 20px !important;
+                font-size: 1em !important;
+                margin-bottom: 10px !important;
+            }
+
+            #quitQuizBtn {
+                top: 10px !important;
+                right: 10px !important;
+                padding: 6px 12px !important;
+                font-size: 0.8em !important;
+            }
+
+            /* Explore page mobile styles */
+            .weather-card {
+                padding: 15px !important;
+                margin: 10px 0 !important;
+            }
+
+            .weather-value {
+                font-size: 1.8em !important;
+            }
         }
 
         @media (max-width: 480px) {
+            .home-title {
+                font-size: 2em;
+            }
+
+            .home-subtitle {
+                font-size: 1em;
+            }
+
+            .nav-button {
+                padding: 12px 20px;
+                font-size: 1.1em;
+                min-width: 130px;
+                height: 50px;
+            }
+
+            .language-btn {
+                padding: 10px 15px;
+                font-size: 0.9em;
+                min-width: 60px;
+                height: 40px;
+            }
+
+            .level-card, .quiz-level-card {
+                min-width: 250px;
+                padding: 20px 15px;
+            }
+
+            .level-title {
+                font-size: 1.8em;
+            }
+
+            .level-age {
+                font-size: 1.5em;
+            }
+
+            .level-name {
+                font-size: 1.2em;
+            }
+
             .page-display {
                 height: 50vh;
                 min-height: 250px;
@@ -830,6 +977,120 @@
             .btn {
                 padding: 10px 15px;
                 font-size: 0.9em;
+            }
+
+            .btn.side-nav {
+                padding: 10px 12px;
+                min-width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+
+            .left-nav {
+                left: 10px;
+            }
+
+            .right-nav {
+                right: 10px;
+            }
+
+            .book-header {
+                padding: 12px 15px;
+            }
+
+            .book-title {
+                font-size: 1em;
+                margin: 0 10px;
+            }
+
+            /* Quiz mobile styles for small screens */
+            #quizContainer {
+                padding: 20px 15px !important;
+                margin: 5px !important;
+            }
+
+            .quiz-option {
+                padding: 12px 15px !important;
+                font-size: 0.9em !important;
+            }
+
+            /* Explore page mobile styles for small screens */
+            .weather-card {
+                padding: 12px !important;
+            }
+
+            .weather-value {
+                font-size: 1.5em !important;
+            }
+        }
+
+        /* Touch-specific enhancements */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-button,
+            .language-btn,
+            .level-card,
+            .quiz-level-card,
+            .btn {
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+
+            .nav-button:active,
+            .language-btn:active,
+            .level-card:active,
+            .quiz-level-card:active,
+            .btn:active {
+                transform: scale(0.95);
+            }
+
+            /* Increase touch targets */
+            .btn.side-nav {
+                min-width: 60px;
+                height: 60px;
+            }
+
+            .language-btn {
+                min-height: 48px;
+                min-width: 80px;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media screen and (orientation: landscape) and (max-height: 500px) {
+            .home-title {
+                font-size: 2em;
+            }
+
+            .home-subtitle {
+                font-size: 0.9em;
+                margin-bottom: 20px;
+            }
+
+            .nav-button {
+                padding: 10px 20px;
+                font-size: 1em;
+                height: 45px;
+            }
+
+            .page-display {
+                height: 70vh;
+                min-height: 200px;
+            }
+
+            .level-title {
+                font-size: 1.8em;
+            }
+
+            .level-container {
+                gap: 15px;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .page img {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
             }
         }
 
@@ -842,6 +1103,26 @@
             color: #7f8c8d;
             font-size: 0.8em;
             opacity: 0.7;
+        }
+
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .home-page,
+            .level-page,
+            #quizPage,
+            #explorePage {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Fix for iOS Safari viewport height issues */
+            .home-page,
+            .level-page {
+                min-height: -webkit-fill-available;
+            }
         }
     </style>
 </head>
@@ -1265,25 +1546,52 @@
 
                 // Touch gestures
                 if (settings.enableTouchGestures) {
+                    // Prevent default touch behaviors that might interfere
                     this.pageContainer.addEventListener('touchstart', (e) => {
                         this.touchStartX = e.changedTouches[0].screenX;
-                    });
+                        this.touchStartY = e.changedTouches[0].screenY;
+                        this.touchStartTime = Date.now();
+                    }, { passive: true });
+
+                    this.pageContainer.addEventListener('touchmove', (e) => {
+                        // Prevent scrolling during horizontal swipes
+                        const touchX = e.changedTouches[0].screenX;
+                        const touchY = e.changedTouches[0].screenY;
+                        const deltaX = Math.abs(touchX - this.touchStartX);
+                        const deltaY = Math.abs(touchY - this.touchStartY);
+                        
+                        if (deltaX > deltaY && deltaX > 10) {
+                            e.preventDefault();
+                        }
+                    }, { passive: false });
 
                     this.pageContainer.addEventListener('touchend', (e) => {
                         this.touchEndX = e.changedTouches[0].screenX;
+                        this.touchEndY = e.changedTouches[0].screenY;
+                        this.touchEndTime = Date.now();
                         this.handleSwipe();
-                    });
+                    }, { passive: true });
                 }
             }
 
             handleSwipe() {
                 const swipeThreshold = 50;
-                const diff = this.touchStartX - this.touchEndX;
+                const maxSwipeTime = 500; // Maximum time for a valid swipe (ms)
+                const minSwipeDistance = 30; // Minimum distance for a swipe
                 
-                if (Math.abs(diff) > swipeThreshold) {
-                    if (diff > 0) {
+                const deltaX = this.touchStartX - this.touchEndX;
+                const deltaY = Math.abs(this.touchStartY - this.touchEndY);
+                const swipeTime = this.touchEndTime - this.touchStartTime;
+                const swipeDistance = Math.abs(deltaX);
+                
+                // Check if it's a valid horizontal swipe
+                if (swipeTime < maxSwipeTime && 
+                    swipeDistance > minSwipeDistance && 
+                    swipeDistance > deltaY * 2) { // Horizontal swipe should be more prominent than vertical
+                    
+                    if (deltaX > swipeThreshold) {
                         this.nextPage(); // Swipe left = next page
-                    } else {
+                    } else if (deltaX < -swipeThreshold) {
                         this.previousPage(); // Swipe right = previous page
                     }
                 }
@@ -2100,7 +2408,25 @@
                         width: 90%;
                         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
                         border: 1px solid rgba(255, 255, 255, 0.2);
+                        position: relative;
                     ">
+                        <button id="quitQuizBtn" style="
+                            position: absolute;
+                            top: 15px;
+                            right: 15px;
+                            background: rgba(255, 0, 0, 0.2);
+                            color: white;
+                            border: 2px solid rgba(255, 0, 0, 0.5);
+                            padding: 8px 15px;
+                            border-radius: 20px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            font-size: 0.9em;
+                            font-weight: bold;
+                            backdrop-filter: blur(10px);
+                        " onmouseover="this.style.background='rgba(255, 0, 0, 0.4)'; this.style.borderColor='rgba(255, 0, 0, 0.8)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255, 0, 0, 0.2)'; this.style.borderColor='rgba(255, 0, 0, 0.5)'; this.style.transform='translateY(0)'">
+                            ${isArabic ? '✕ خروج' : '✕ Quit'}
+                        </button>
                         <h1 style="font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
                             🧠 ${isArabic ? quizTitleAr : quizTitle}
                         </h1>
@@ -2330,6 +2656,21 @@
             setTimeout(() => {
                 quizPage.style.opacity = '1';
             }, 50);
+            
+            // Add quit button functionality
+            document.getElementById('quitQuizBtn').addEventListener('click', () => {
+                const confirmQuit = confirm(isArabic ? 'هل أنت متأكد من أنك تريد الخروج من الاختبار؟' : 'Are you sure you want to quit the quiz?');
+                if (confirmQuit) {
+                    const quizPage = document.getElementById('quizPage');
+                    quizPage.style.transition = 'opacity 0.5s ease-out';
+                    quizPage.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        quizPage.remove();
+                        goBackToHome();
+                    }, 500);
+                }
+            });
         }
 
         function showExploreSpaceWeather() {
