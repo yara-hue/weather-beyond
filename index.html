@@ -16,15 +16,11 @@
             --primary: #ffa866;
             --secondary: #94d5d8;
             --accent: #6dafca;
-            --flip-duration: 500ms;
             /* book design variables */
             --body-bg: #FAFAFA;
-            --page-bg: #F5F5F5;
             --dark-text: #2A2935;
             --baseline: 10px;
-            --book-title: 'Tulpen One', sans-serif;
             --title: 'Cormorant Garamond', serif;
-            --body: 'Cormorant Garamond', serif;
         }
 
         * {
@@ -410,9 +406,9 @@
             50% { opacity: 1; transform: scale(1.3); }
         }
 
-        /* ========== TWO-PAGE SPREAD BOOK DESIGN ========== */
+        /* ========== EMPTY PAGE STYLES ========== */
 
-        .cover {
+        .empty-page {
             position: relative;
             width: calc(var(--baseline) * 60);
             max-width: 94vw;
@@ -423,30 +419,7 @@
             overflow: visible;
         }
 
-        .book-cover {
-            position: absolute;
-            inset: 0;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-            background-color: var(--page-bg);
-        }
-        .book-cover.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .book-cover.hiding {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Back + audio buttons overlay */
-        .cover .back-btn {
+        .empty-page .back-btn {
             position: absolute;
             top: calc(var(--baseline) * -3.5);
             left: 0;
@@ -462,230 +435,7 @@
             transition: opacity 0.25s;
             opacity: 0.6;
         }
-        .cover .back-btn:hover { opacity: 1; }
-        .cover .audio-btn {
-            position: absolute;
-            top: calc(var(--baseline) * -3.5);
-            right: 0;
-            background: none;
-            border: none;
-            color: #2A2935;
-            cursor: pointer;
-            font-size: calc(var(--baseline) * 1.4);
-            z-index: 20;
-            padding: 4px;
-            transition: opacity 0.25s;
-            opacity: 0.6;
-            line-height: 1;
-        }
-        .cover .audio-btn:hover { opacity: 1; }
-
-        .book {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            perspective: 1200px;
-        }
-
-        /* ── Each page = half the book ── */
-        .book__page {
-            position: relative;
-            width: 50%;
-            height: 100%;
-            transform: rotateY(0deg);
-            transition: transform 0.9s cubic-bezier(0.645, 0.045, 0.355, 1);
-            transform-origin: 0% 0%;
-            background-color: var(--page-bg);
-            background-image: linear-gradient(90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
-        }
-
-        .book__page--1 {
-            background-image: linear-gradient(-90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
-            cursor: pointer;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .book__page--1,
-        .book__page--4,
-        .book__page-front,
-        .book__page-back {
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .book__page--2 {
-            position: absolute;
-            right: 0;
-            pointer-events: none;
-            transform-style: preserve-3d;
-            transform: rotateY(0deg);
-            transition: transform 0.9s cubic-bezier(0.645, 0.045, 0.355, 1);
-            background-color: var(--page-bg);
-            background-image: linear-gradient(90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
-            z-index: 2;
-        }
-
-        .flip-toggle {
-            display: none;
-        }
-        .flip-toggle:checked + .book__page--2 {
-            transform: rotateY(-180deg);
-        }
-
-        .book__page--4 {
-            cursor: pointer;
-            z-index: 0;
-        }
-
-        .book__page-front,
-        .book__page-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            overflow: hidden;
-        }
-
-        .book__page-front {
-            transform: rotateY(0deg) translateZ(1px);
-        }
-
-        .book__page-back {
-            transform: rotateY(180deg) translateZ(1px);
-            background-color: var(--page-bg);
-            background-image: linear-gradient(-90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
-        }
-
-        .page__number {
-            position: absolute;
-            bottom: var(--baseline);
-            width: calc(100% - (var(--baseline) * 2));
-            left: var(--baseline);
-            font-family: var(--title);
-            font-size: calc(var(--baseline) * 0.7);
-            text-align: center;
-            color: var(--dark-text);
-            font-weight: 400;
-            opacity: 0.8;
-            pointer-events: none;
-            text-shadow: 0 1px 3px rgba(255,255,255,0.6), 0 0 6px rgba(255,255,255,0.4);
-        }
-
-        /* ── Navigation corner buttons ── */
-
-        .nav-corner {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 40%;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            z-index: 15;
-            font-size: calc(var(--baseline) * 3);
-            color: var(--dark-text);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            font-family: var(--title);
-            font-weight: 300;
-            line-height: 1;
-        }
-        .cover:hover .nav-corner { opacity: 0.3; }
-        .nav-corner:hover { opacity: 0.7 !important; }
-        .nav-corner:disabled { display: none; }
-
-        .nav-left {
-            left: 0;
-            text-align: left;
-            padding-left: calc(var(--baseline) * 0.8);
-        }
-        .nav-right {
-            right: 0;
-            text-align: right;
-            padding-right: calc(var(--baseline) * 0.8);
-        }
-
-        /* ── Footer ── */
-
-        .book-footer {
-            position: absolute;
-            bottom: calc(var(--baseline) * -3);
-            left: 0;
-            right: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2px;
-            font-family: var(--title);
-            color: var(--dark-text);
-            font-size: calc(var(--baseline) * 0.85);
-            opacity: 0.5;
-        }
-        .book-footer__title {
-            font-weight: 600;
-            font-size: calc(var(--baseline) * 0.85);
-        }
-        .book-footer__pages {
-            font-weight: 400;
-        }
-        .book-footer__right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* ── Loading spinner ── */
-        .loading-indicator {
-            display: none;
-        }
-        .loading-indicator .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(42, 41, 53, 0.15);
-            border-top-color: var(--dark-text);
-            border-radius: 50%;
-            animation: book-spin 0.7s linear infinite;
-        }
-        @keyframes book-spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .end-options {
-            display: none;
-        }
-        .end-options .quiz-btn {
-            background: none;
-            border: none;
-            color: var(--dark-text);
-            font-family: var(--title);
-            font-size: calc(var(--baseline) * 0.85);
-            font-weight: 600;
-            cursor: pointer;
-            padding: 2px 8px;
-            opacity: 0.7;
-            transition: opacity 0.25s;
-        }
-        .end-options .quiz-btn:hover { opacity: 1; }
-
-        /* ── RTL ── */
-        .cover.rtl .book__page--2 {
-            right: auto;
-            left: 0;
-            transform-origin: 100% 0%;
-            background-image: linear-gradient(-90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
-        }
-        .cover.rtl .flip-toggle:checked + .book__page--2 {
-            transform: rotateY(180deg);
-        }
-        .cover.rtl .book__page--1 {
-            background-image: linear-gradient(90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
-        }
-        .cover.rtl .nav-left { left: auto; right: 0; text-align: right; padding-left: 0; padding-right: calc(var(--baseline) * 0.8); }
-        .cover.rtl .nav-right { right: auto; left: 0; text-align: left; padding-right: 0; padding-left: calc(var(--baseline) * 0.8); }
-        .cover.rtl .book-footer { direction: rtl; }
+        .empty-page .back-btn:hover { opacity: 1; }
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -744,20 +494,12 @@
                 font-size: 2.2em;
             }
 
-            .cover {
+            .empty-page {
                 --baseline: 8px;
             }
-            .cover .back-btn {
+            .empty-page .back-btn {
                 top: calc(var(--baseline) * -3);
                 font-size: calc(var(--baseline) * 1);
-            }
-            .cover .audio-btn {
-                top: calc(var(--baseline) * -3);
-                font-size: calc(var(--baseline) * 1.3);
-            }
-            .book-footer {
-                bottom: calc(var(--baseline) * -2.5);
-                font-size: calc(var(--baseline) * 0.75);
             }
 
             .fullscreen-btn {
@@ -837,20 +579,12 @@
                 font-size: 1.2em;
             }
 
-            .cover {
+            .empty-page {
                 --baseline: 6px;
             }
-            .cover .back-btn {
+            .empty-page .back-btn {
                 top: calc(var(--baseline) * -2.5);
                 font-size: calc(var(--baseline) * 0.9);
-            }
-            .cover .audio-btn {
-                top: calc(var(--baseline) * -2.5);
-                font-size: calc(var(--baseline) * 1.2);
-            }
-            .book-footer {
-                bottom: calc(var(--baseline) * -2);
-                font-size: calc(var(--baseline) * 0.7);
             }
 
             /* Quiz mobile styles for small screens */
@@ -916,7 +650,7 @@
                 height: 45px;
             }
 
-            .cover {
+            .empty-page {
                 --baseline: 8px;
             }
 
@@ -931,11 +665,7 @@
 
         /* High DPI displays */
         @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .book__page--1,
-            .book__page--2,
-            .book__page--4,
-            .book__page-front,
-            .book__page-back {
+            .empty-page {
                 image-rendering: -webkit-optimize-contrast;
                 image-rendering: crisp-edges;
             }
@@ -1103,64 +833,12 @@
         </div>
     </div>
 
-    <!-- FLIPBOOK APPLICATION -->
-    <div class="cover" id="flipbook">
-        <!-- Back button -->
-        <button class="back-btn" id="backToHomeFromFlipbook">
+    <!-- EMPTY PAGE (replaces flipbook) -->
+    <div class="empty-page" id="emptyPage">
+        <button class="back-btn" id="backFromEmptyPage">
             <span class="back-home-en">← Back</span>
             <span class="back-home-ar" style="display: none;">← رجوع</span>
         </button>
-        <!-- Audio button -->
-        <button class="audio-btn" id="readAloudBtn">
-            <span class="read-aloud-en">🔊</span>
-            <span class="read-aloud-ar" style="display: none;">🔊</span>
-        </button>
-
-        <div class="book">
-            <!-- Left page (static) -->
-            <div class="book__page book__page--1" id="pageLeft">
-                <div class="page__number" id="leftNum">1</div>
-            </div>
-
-            <!-- Right content page (hidden behind overlay) -->
-            <div class="book__page book__page--4" id="pageRight">
-                <div class="page__number" id="rightNum">2</div>
-            </div>
-
-            <input type="checkbox" id="flipToggle" class="flip-toggle" autocomplete="off">
-            <!-- Flipping overlay (absolute, covers right half) -->
-            <div class="book__page book__page--2" id="pageFlip">
-                <div class="book__page-front">
-                    <div class="page__number" id="frontNum">2</div>
-                </div>
-                <div class="book__page-back">
-                    <div class="page__number" id="backNum">3</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="book-cover" id="bookCover"></div>
-
-        <!-- Navigation buttons -->
-        <button class="nav-corner nav-left" id="prevBtn">‹</button>
-        <button class="nav-corner nav-right" id="nextBtn">›</button>
-
-        <!-- Footer bar -->
-        <div class="book-footer">
-            <span class="book-footer__title" id="bookTitle">The Sun Sneezes</span>
-            <span class="book-footer__pages" id="pageCounter">1 — 2 / 10</span>
-            <div class="book-footer__right">
-                <div class="loading-indicator" id="loadingIndicator">
-                    <div class="spinner"></div>
-                </div>
-                <div class="end-options" id="endOptions" style="display: none;">
-                    <button class="quiz-btn" id="goToQuizBtn">
-                        <span class="quiz-en">📝 Quiz</span>
-                        <span class="quiz-ar" style="display: none;">📝 اختبار</span>
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -1231,518 +909,20 @@
             }
         };
 
-        // Get pages based on selected level and language
-        function getBookPages() {
-            const selectedLevel = window.selectedLevel || 'curious';
-            
-            // Check multiple ways to determine language
-            const arabicBtn = document.getElementById('arabicBtn');
-            const isArabicFromBtn = arabicBtn && arabicBtn.classList.contains('active');
-            const isArabicFromGlobal = window.currentLanguage === 'ar';
-            const isArabic = isArabicFromBtn || isArabicFromGlobal;
-            
-            const language = isArabic ? 'ar' : 'en';
-            
-            console.log(`🌐 Language detection: ${language}, Level: ${selectedLevel}`);
-            console.log(`🔍 Arabic button active:`, isArabicFromBtn);
-            console.log(`🔍 Global language:`, window.currentLanguage);
-            
-            const levelData = levelPages[selectedLevel];
-            if (levelData && levelData[language]) {
-                console.log(`📚 Loading ${language} pages for ${selectedLevel}:`, levelData[language]);
-                return levelData[language];
-            }
-            
-            // Fallback to English if Arabic not available, then to young explorers English
-            const fallback = (levelData && levelData['en']) || levelPages['curious']['en'];
-            console.log(`⚠️ Using fallback pages:`, fallback);
-            return fallback;
-        }
-
-        // Legacy bookPages for backward compatibility
-        const bookPages = [
-            // 🖼️ ADD YOUR IMAGE FILENAMES HERE:
-            // Replace these example names with your actual image files
-            "images/page1.jpg",      // Page 1
-            "images/page2.jpg",      // Page 2  
-            "images/page3.jpg",      // Page 3
-            "images/page4.jpg",      // Page 4
-            "images/page5.jpg",      // Page 5
-            "images/page6.jpg",      // Page 6
-            "images/page7.jpg",      // Page 7
-            "images/page8.jpg",      // Page 8
-            "images/page9.jpg",      // Page 9
-            "images/page10.jpg",     // Page 10
-            "images/page11.jpg",     // Page 11
-            "images/page12.jpg",     // Page 12
-            "images/page13.jpg",     // Page 13
-            "images/page14.jpg",     // Page 14
-            "images/page15.jpg",     // Page 15
-            
-            // 📋 TO ADD MORE PAGES: 
-            // Uncomment and modify the lines below, or add new ones
-            // "images/page16.jpg",     // Page 16
-            // "images/page17.jpg",     // Page 17
-            // "images/page18.jpg",     // Page 18
-            // "images/page19.jpg",     // Page 19
-            // "images/page20.jpg",     // Page 20
-        ];
-
         // ========================================
-        // CUSTOMIZATION SETTINGS
-        // ========================================
-        const settings = {
-            // 🎨 ANIMATION SPEED (in milliseconds)
-            // Lower = faster, Higher = slower
-            animationSpeed: 500,
-            
-            // 📖 BOOK TITLE (appears at the top)
-            bookTitle: "My Interactive Flipbook",
-            
-            // 🎯 AUTO-HIDE CONTROLS (in milliseconds, 0 = never hide)
-            autoHideControls: 0,
-            
-            // 📱 ENABLE TOUCH GESTURES
-            enableTouchGestures: true,
-            
-            // ⌨️ ENABLE KEYBOARD NAVIGATION  
-            enableKeyboardNav: true
-        };
-
-        // ========================================
-        // APPLICATION CODE (Don't modify unless you know what you're doing)
+        // APPLICATION CODE
         // ========================================
         
-        class FlipbookApp {
-            constructor() {
-                const currentBookPages = getBookPages();
-                
-                this.bookPages = currentBookPages;
-                this.totalPages = currentBookPages.length;
-                this.currentSpread = -1;  // -1 = cover
-                this.totalSpreads = Math.ceil((this.totalPages - 1) / 2);
-                this.isAnimating = false;
-                this.touchStartX = 0;
-                this.touchEndX = 0;
-                this.touchStartTime = 0;
-                
-                this.initializeElements();
-                this.showSpread(-1);
-                this.setupEventListeners();
-                this.updateDisplay();
-            }
-
-            initializeElements() {
-                this.flipbook = document.getElementById('flipbook');
-                this.pageLeft = document.getElementById('pageLeft');
-                this.pageRight = document.getElementById('pageRight');
-                this.pageFlip = document.getElementById('pageFlip');
-                this.flipToggle = document.getElementById('flipToggle');
-                this.leftPage = document.getElementById('pageLeft');
-                this.rightPage = document.getElementById('pageRight');
-                this.pageFront = document.querySelector('.book__page-front');
-                this.pageBack = document.querySelector('.book__page-back');
-                this.bookCover = document.getElementById('bookCover');
-                this.leftNum = document.getElementById('leftNum');
-                this.rightNum = document.getElementById('rightNum');
-                this.frontNum = document.getElementById('frontNum');
-                this.backNum = document.getElementById('backNum');
-                this.prevBtn = document.getElementById('prevBtn');
-                this.nextBtn = document.getElementById('nextBtn');
-                this.readAloudBtn = document.getElementById('readAloudBtn');
-                this.backToHomeBtn = document.getElementById('backToHomeFromFlipbook');
-                this.goToQuizBtn = document.getElementById('goToQuizBtn');
-                this.endOptions = document.getElementById('endOptions');
-                this.pageCounter = document.getElementById('pageCounter');
-                this.bookTitle = document.getElementById('bookTitle');
-            }
-
-            setPageImage(el, idx) {
-                if (idx < this.totalPages) {
-                    el.style.backgroundImage = `url(${this.bookPages[idx]})`;
-                    return true;
-                }
-                el.style.backgroundImage = 'none';
-                return false;
-            }
-
-            showSpread(spreadIndex) {
-                let leftIdx, rightIdx, backIdx;
-
-                if (spreadIndex === -1) {
-                    leftIdx = 0;
-                    rightIdx = 0;
-                    backIdx = 1;
-
-                    this.setPageImage(this.bookCover, 0);
-                    this.bookCover.classList.remove('hiding');
-                    this.bookCover.classList.add('visible');
-                } else {
-                    leftIdx = spreadIndex * 2 + 1;
-                    rightIdx = leftIdx + 1;
-                    backIdx = leftIdx + 2;
-                }
-
-                this.setPageImage(this.leftPage, leftIdx);
-                this.leftNum.textContent = spreadIndex === -1 ? '' : leftIdx + 1;
-
-                this.setPageImage(this.pageFront, rightIdx);
-                this.frontNum.textContent = (spreadIndex === -1 || rightIdx >= this.totalPages) ? '' : rightIdx + 1;
-
-                this.setPageImage(this.pageBack, backIdx);
-                this.backNum.textContent = backIdx < this.totalPages ? backIdx + 1 : '';
-
-                this.setPageImage(this.rightPage, rightIdx);
-                this.rightNum.textContent = (spreadIndex === -1 || rightIdx >= this.totalPages) ? '' : rightIdx + 1;
-
-                if (spreadIndex !== -1) {
-                    this.bookCover.classList.remove('visible', 'hiding');
-                }
-
-                // Reset overlay to unflipped
-                this.pageFlip.style.transition = 'none';
-                this.flipToggle.checked = false;
-                void this.pageFlip.offsetHeight;
-                this.pageFlip.style.transition = '';
-
-                this.currentSpread = spreadIndex;
-                this.updateDisplay();
-            }
-
-            setupEventListeners() {
-                this.prevBtn.addEventListener('click', () => this.previousPage());
-                this.nextBtn.addEventListener('click', () => this.nextPage());
-                this.readAloudBtn.addEventListener('click', () => this.readCurrentPage());
-                this.backToHomeBtn.addEventListener('click', () => this.goBackToHome());
-                this.goToQuizBtn.addEventListener('click', () => this.goToQuiz());
-
-                this.pageLeft.addEventListener('click', () => this.previousPage());
-                this.pageRight.addEventListener('click', () => this.nextPage());
-                this.bookCover.addEventListener('click', () => this.nextPage());
-
-                if (settings.enableKeyboardNav) {
-                    document.addEventListener('keydown', (e) => {
-                        if (e.key === 'ArrowLeft') this.previousPage();
-                        if (e.key === 'ArrowRight') this.nextPage();
-                        if (e.key === ' ') { e.preventDefault(); this.readCurrentPage(); }
-                    });
-                }
-
-                if (settings.enableTouchGestures) {
-                    const area = this.flipbook;
-                    area.addEventListener('touchstart', (e) => {
-                        this.touchStartX = e.changedTouches[0].screenX;
-                        this.touchStartY = e.changedTouches[0].screenY;
-                        this.touchStartTime = Date.now();
-                    }, { passive: true });
-
-                    area.addEventListener('touchmove', (e) => {
-                        const dx = Math.abs(e.changedTouches[0].screenX - this.touchStartX);
-                        const dy = Math.abs(e.changedTouches[0].screenY - this.touchStartY);
-                        if (dx > dy && dx > 10) e.preventDefault();
-                    }, { passive: false });
-
-                    area.addEventListener('touchend', (e) => {
-                        this.touchEndX = e.changedTouches[0].screenX;
-                        const dx = this.touchStartX - this.touchEndX;
-                        const dt = Date.now() - this.touchStartTime;
-                        if (dt < 500 && Math.abs(dx) > 30) {
-                            if (dx > 0) this.nextPage();
-                            else this.previousPage();
-                        }
-                    }, { passive: true });
-                }
-            }
-
-            nextPage() {
-                if (this.isAnimating) return;
-
-                if (this.currentSpread === -1) {
-                    this.isAnimating = true;
-
-                    this.bookCover.classList.remove('visible');
-                    this.bookCover.classList.add('hiding');
-
-                    this.setPageImage(this.pageBack, 1);
-                    this.backNum.textContent = '1';
-
-                    this.setPageImage(this.rightPage, 2);
-                    this.rightNum.textContent = '2';
-
-                    setTimeout(() => {
-                        this.flipToggle.checked = true;
-
-                        const onFlipEnd = () => {
-                            this.pageFlip.removeEventListener('transitionend', onFlipEnd);
-
-                            this.setPageImage(this.leftPage, 1);
-                            this.leftNum.textContent = '1';
-                            this.setPageImage(this.pageFront, 2);
-                            this.frontNum.textContent = '2';
-
-                            this.pageFlip.style.transition = 'none';
-                            this.flipToggle.checked = false;
-                            void this.pageFlip.offsetHeight;
-                            this.pageFlip.style.transition = '';
-
-                            this.currentSpread = 0;
-                            this.updateDisplay();
-                            this.isAnimating = false;
-                        };
-                        this.pageFlip.addEventListener('transitionend', onFlipEnd, { once: true });
-                    }, 500);
-                    return;
-                }
-
-                if (this.currentSpread >= this.totalSpreads - 1) return;
-                this.isAnimating = true;
-
-                const nextSpread = this.currentSpread + 1;
-                const backIdx = nextSpread * 2 + 1;
-                const nextRight = nextSpread * 2 + 2;
-
-                this.setPageImage(this.pageBack, backIdx);
-                this.backNum.textContent = backIdx < this.totalPages ? backIdx + 1 : '';
-
-                this.setPageImage(this.rightPage, nextRight);
-                this.rightNum.textContent = nextRight < this.totalPages ? nextRight + 1 : '';
-
-                this.flipToggle.checked = true;
-
-                const onFlipEnd = () => {
-                    this.pageFlip.removeEventListener('transitionend', onFlipEnd);
-
-                    this.setPageImage(this.leftPage, backIdx);
-                    this.leftNum.textContent = backIdx + 1;
-
-                    this.setPageImage(this.pageFront, nextRight);
-                    this.frontNum.textContent = nextRight < this.totalPages ? nextRight + 1 : '';
-
-                    this.pageFlip.style.transition = 'none';
-                    this.flipToggle.checked = false;
-                    void this.pageFlip.offsetHeight;
-                    this.pageFlip.style.transition = '';
-
-                    this.currentSpread = nextSpread;
-                    this.updateDisplay();
-                    this.isAnimating = false;
-                };
-                this.pageFlip.addEventListener('transitionend', onFlipEnd, { once: true });
-            }
-
-            previousPage() {
-                if (this.isAnimating || this.currentSpread <= -1) return;
-                this.isAnimating = true;
-
-                if (this.currentSpread === 0) {
-                    this.setPageImage(this.leftPage, 0);
-                    this.leftNum.textContent = '';
-                    this.setPageImage(this.pageFront, 0);
-                    this.frontNum.textContent = '';
-                    this.setPageImage(this.pageBack, 1);
-                    this.backNum.textContent = '';
-                    this.setPageImage(this.rightPage, 0);
-                    this.rightNum.textContent = '';
-
-                    this.bookCover.classList.remove('hiding');
-                    this.bookCover.classList.add('visible');
-
-                    this.pageFlip.style.transition = 'none';
-                    this.flipToggle.checked = false;
-                    void this.pageFlip.offsetHeight;
-                    this.pageFlip.style.transition = '';
-
-                    this.currentSpread = -1;
-                    this.updateDisplay();
-                    this.isAnimating = false;
-                    return;
-                }
-
-                const prevSpread = this.currentSpread - 1;
-                const prevLeft = prevSpread * 2 + 1;
-                const prevRight = prevLeft + 1;
-
-                this.setPageImage(this.leftPage, prevLeft);
-                this.leftNum.textContent = prevLeft + 1;
-
-                this.setPageImage(this.pageFront, prevRight);
-                this.frontNum.textContent = prevRight < this.totalPages ? prevRight + 1 : '';
-
-                this.setPageImage(this.pageBack, prevRight);
-                this.backNum.textContent = prevRight < this.totalPages ? prevRight + 1 : '';
-
-                this.setPageImage(this.rightPage, prevRight);
-                this.rightNum.textContent = prevRight < this.totalPages ? prevRight + 1 : '';
-
-                this.pageFlip.style.transition = 'none';
-                this.flipToggle.checked = false;
-                void this.pageFlip.offsetHeight;
-                this.pageFlip.style.transition = '';
-
-                this.currentSpread = prevSpread;
-                this.updateDisplay();
-                this.isAnimating = false;
-            }
-
-            readCurrentPage() {
-                if (window.speechSynthesis.speaking) {
-                    window.speechSynthesis.cancel();
-                    return;
-                }
-                const isArabic = document.getElementById('arabicBtn')?.classList.contains('active');
-                const leftIdx = this.currentSpread === -1 ? 0 : this.currentSpread * 2 + 1;
-                const text = this.getPageText(leftIdx, isArabic);
-                if (!text) return;
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang = isArabic ? 'ar-SA' : 'en-US';
-                u.rate = 0.8;
-                window.speechSynthesis.speak(u);
-            }
-
-            getPageText(pageIndex, isArabic) {
-                const selectedLevel = window.selectedLevel || 'curious';
-                const textContent = {
-                    'curious': {
-                        'ar': {
-                            0: "الشَّمْسُ تَعْطِسُ",
-                            1: "كُنْتُ أَعِيشُ عَلَى أَكْبَرِ وَأَلْمَعِ نَجْمٍ فِي سَمَائِنَا: الشَّمْسِ. كَانَ هَذَا هُوَ بَيْتِي! ثُمَّ، فِي صَبَاحِ أَحَدِ الْأَيَّامِ، شَعَرْتُ بِدَغْدَغَةٍ نَارِيَّةٍ عِمْلَاقَةٍ بَدَأَتْ عَمِيقًا فِي دَاخِلِي.",
-                            2: "تَمْتَمَتِ الشَّمْسُ قَائِلَةً: هَا... هَا... هَا... هاتشووو! أَطْلَقَتِ الشَّمْسُ عَطْسَةً عِمْلَاقَةً، وَفَجْأَةً، وَجَدْتُ نَفْسِي أَطِيرُ!",
-                            3: "كُنْتُ قِطْعَةً صَغِيرَةً وَضَاحِكَةً مِنْ تِلْكَ الْعَطْسَةِ، وَاسْمِي هُوَ شَرَارَةُ. طِرْتُ مُبَاشَرَةً إِلَى الْفَضَاءِ! صَرَخْتُ: وَيِيِي! يَا لَهَا مِنْ مُغَامَرَةٍ سَتَكُونُ!",
-                            4: "مَحَطَّتِي الْأُولَى: الْأَقْمَارُ الصِّنَاعِيَّةُ. انْطَلَقْتُ بِجِوَارِهَا وَدَغْدَغْتُهَا قَلِيلًا. بَدَأَتْ تَدُورُ وَشَعَرَتْ بِالدُّوَارِ! رَأَتْهُمْ عَالِمَةٌ عَلَى الْأَرْضِ وَهُمْ يَتَأَرْجَحُونَ. أَرْسَلَتْ إِشَارَةً لِلْمُسَاعَدَةِ فِي إِصْلَاحِهِمْ. قَالَتْ: كُلُّ شَيْءٍ أَفْضَلُ!، وَوَاصَلْتُ طَرِيقِي",
-                            5: "بَعْدَ ذَلِكَ، انْطَلَقْتُ بِسُرْعَةٍ وَدَغْدَغْتُ خُطُوطَ الْكَهْرَبَاءِ الْكَبِيرَةَ. تَلَوَّتِ الْخُطُوطُ، وَبُوُوفْ! انْطَفَأَتِ الْأَضْوَاءُ! جَاءَتْ عَامِلَةٌ فِي شَاحِنَةٍ كَبِيرَةٍ بِسُرْعَةٍ. سَاعَدَتْ فِي إِصْلَاحِ الْكَهْرَبَاءِ. هَتَفَتْ: لَقَدْ أُضِيئَتْ! كُنْتُ أَتَسَبَّبُ فِي كُلِّ أَنْوَاعِ الْمَشَاغَبَةِ!",
-                            6: "حَاوَلْتُ الرَّقْصَ دَاخِلَ مَحَطَّةِ الْفَضَاءِ، لَكِنْ لَمْ أَسْتَطِعِ الدُّخُولَ! كَانَ رُوَّادُ الْفَضَاءِ آمِنِينَ فِي الدَّاخِلِ. مَحَطَّةُ الْفَضَاءِ الْخَاصَّةُ بِهِمْ عِبَارَةٌ عَنْ مَنْزِلٍ فَائِقِ الْقُوَّةِ، بُنِيَ لِحِمَايَتِهِمْ مِنْ كُلِّ عَطَسَاتِ الشَّمْسِ. لَوَّحُوا لِي تَرْحِيبًا مِنْ حِصْنِهِمِ الْمُرِيحِ.",
-                            7: "مَرَرْتُ بِسُرْعَةٍ بِجَانِبِ طَائِرَةٍ فِي السَّمَاءِ. دَغْدَغْتُ جِهَازَ الرَّادْيُو الْخَاصِّ بِالطَّيَّارِ بِسُرْعَةٍ. طَنِينٌ... طَنِينٌ... صَدَرَ صَوْتُ الرَّادْيُو. لَكِنَّ الطَّيَّارَ بَقِيَ هَادِئًا تَمَامًا. كَانَ يَعْرِفُ بِالضَّبْطِ مَا يَجِبُ فِعْلُهُ لِمُوَاصَلَةِ الطَّيَرَانِ بِأَمَانٍ.",
-                            8: "وَصَلْتُ إِلَى جَرَّارٍ زِرَاعِيٍّ فِي حَقْلٍ. دَغْدَغْتُ شَاشَةَ الْخَرِيطَةِ الْخَاصَّةِ بِهِ، وَأَصْبَحَتْ فَارِغَةً! ابْتَسَمَ الْمُزَارِعُ زَيْنٌ فَقَطْ. قَالَ: حَانَ الْوَقْتُ لِأَقُودَ بِنَفْسِي! وَوَاصَلَ الْقِيَادَةَ بِشَكْلٍ مِثَالِيٍّ، حَتَّى بِدُونِ الشَّاشَةِ. الْبَشَرُ أَذْكِيَاءُ جِدًّا!",
-                            9: "وَأَخِيرًا، بَدَأَتْ طَاقَتِي تَنْفَدُ. انْتَهَتْ رِحْلَتِي. لَمَسْتُ قِمَّةَ سَمَاءِ الْأَرْضِ وَأَطْلَقْتُ كُلَّ مَا تَبَقَّى مِنْ نُورِي. نَظَرَ النَّاسُ عَلَى الْأَرْضِ لِيَرَوْنِي وَأَنَا أَتَوَهَّجُ. رَأَوْا أَلْوَانِي الْجَمِيلَةَ وَالْمُشْرِقَةَ! هَتَفُوا: يَا إِلَهِي! الشَّفَقُ الْقُطْبِيُّ! قَدَّمْتُ عَرْضًا أَخِيرًا وَجَمِيلًا قَبْلَ أَنْ أَتَلَاشَى."
-                        },
-                        'en': {
-                            0: "The Sun Sneezes",
-                            1: "I used to live on the biggest, brightest star in our sky: the Sun. It was home! Then, one morning, I felt a giant, fiery tickle start deep inside.",
-                            2: "'А-a-a-a...' the Sun rumbled. CHOooo! The Sun let out a giant sneeze, and suddenly; I was flying!",
-                            3: "I was a tiny, giggling piece of that sneeze, and my name is Sparky: I flew right out into space! 'Whee!' I shouted. 'What an adventure this is going to be!'",
-                            4: "My first stop: the satellites! I zipped by and gave them a little tickle. They started spinning and got all dizzy! A scientist on Earth saw them wobble. She sent a signal to help fix them. 'All better!' she said, and I kept going.",
-                            5: "Next, I zoomed down and tickled the big power lines. The lines wiggled, and poof! The lights went out! A worker in a big truck came quickly: She helped fix the power: 'They're on!' she cheered. I was causing all kinds of mischief!",
-                            6: "I tried to dance inside the space station, but I couldn't get in! The astronauts were safe inside. Their space station is a super-strong house, built to protect them from all the Sun's sneezes. They just waved hello at me from their cozy fort.",
-                            7: "I zipped by an airplane in the sky. I gave the pilot's radio a quick tickle. Buzz... Buzz... went the radio. But Pilot Pat was totally calm. She knew just what to do to keep flying safely.",
-                            8: "I made it all the way down to a tractor in a field. I tickled its map screen, and it went blank! Farmer Fran just smiled. 'Time to steer myself?' she said. She kept driving perfectly, even without the screen. Humans are so clever!",
-                            9: "Finally, I was running out of energy. My journey was over. I touched the very top of Earth's sky and let out all my remaining light. People on Earth looked up to see me glow. They saw my beautiful, bright colors! 'Wow! The Aurora!' they cheered. I put on a final, beautiful show before I faded away."
-                        }
-                    },
-                    'seekers': {
-                        'en': {
-                            0: "Weather Beyond: A Space Weather Adventure - Follow Celeste as she discovers how solar storms affect our technology and connect us to the cosmos.",
-                            1: "I'm Celeste, and every clear night I set up my telescope on the rooftop. The stars feel close, and my telescope lets me chase galaxies, nebulae, and wild things in the night sky. But tonight…nothing is working. My telescope's camera keeps flickering, and my star mapping app won't update.",
-                            2: "\"Seriously?\" I muttered, rebooting my phone for the millionth time. The screen froze. My telescope's motor sounded weak, then died. Dad poked his head out the window, coffee in hand. \"Solar storm, maybe?\" he said. \"Space weather hits the tech sometimes.\"",
-                            3: "I blinked. Space weather? I thought that was just science class stuff: solar flares, coronal mass ejections—giant eruptions from the Sun, hurling plasma and energy through space. Could that really reach us here?",
-                            4: "I pulled up the NASA space weather alert. \"Major CME,\" the page flashed. \"Geomagnetic storm likely tonight.\" My favorite astronomy app had a pop-up: \"Satellite tracking offline due to increased solar activity.\"",
-                            5: "Dad explained, \"CME's are like giant clouds of charged particles from the Sun. When they reach Earth, they mess with power lines, GPS, and even telescopes. The Earth's magnetic field usually shields us, but tonight it's getting hammered.\"",
-                            6: "I messaged my astronomy club group chat. Zoey replied, \"My Wi-Fi's down. Jamie says her telescope is acting up, too. Is this why sometimes the Northern Lights show up farther south?\" I smiled, thinking how space weather isn't just a science topic—it's something that connects us all.",
-                            7: "Instead of feeling defeated, I flipped through my old paper star charts and found Orion. I guided my telescope manually, charting what I could by hand. Tonight, the sky wasn't just stars—it was a reminder of how the Sun's power can reach across 150 million kilometers and touch my little corner of Earth.",
-                            8: "As the geomagnetic storm continued, I stared at the sky. Even though my tech was down, I felt a new connection to the cosmos. Somewhere, the auroras might be burning bright—maybe even visible from our city if the solar storm was strong enough.",
-                            9: "Tomorrow, everything would be back to normal—phone, telescope, internet. But now I understood: studying the stars isn't just about looking out. It's about learning how the Sun and Earth are always in conversation, sending signals and storms, connecting every astronomer beneath the sky."
-                        },
-                        'ar': {
-                            0: "سِيليستُ ورِسَالةُ سَمَاءِ اللَّيلِ السِّرِّيَّة .",
-                            1: "أَنَا سِيليستُ، وفِي كُلِّ لَيْلَةٍ صَافِيَةٍ أُعِدُّ تِلِسْكُوبِي عَلَى سَطْحِ المَنْزِلِ. النُّجُومُ تَبْدُو قَرِيبَةً، وَتِلِسْكُوبِي يَسْمَحُ لِي بِمُطَارَدَةِ المَجَرَّاتِ، وَالسُّدُمِ، وَالأَشْيَاءِ الغَرِيبَةِ فِي سَمَاءِ اللَّيْلِ. لَكِنَّ اللَّيْلَةَ... لَا شَيْءَ يَعْمَلُ. كَامِيرَا تِلِسْكُوبِي تَسْتَمِرُّ فِي الوَمِيضِ، وَتَطْبِيقُ خَرِيطَةِ النُّجُومِ الخَاصِّ بِي لَا يَقُومُ بِالتَّحْدِيثِ.",
-                            2: "\"سِرِّيًّا؟\" تَمْتَمْتُ، وَأَعَدْتُ تَشْغِيلَ هَاتِفِي لِلْمَرَّةِ المِلْيُونِ. تَجَمَّدَتِ الشَّاشَةُ. بَدَا صَوْتُ مُحَرِّكِ تِلِسْكُوبِي ضَعِيفًا، ثُمَّ مَاتَ. أَخْرَجَ أَبِي رَأْسَهُ مِنَ النَّافِذَةِ، وَفِي يَدِهِ فِنْجَانُ قَهْوَةٍ. قَالَ: \"عَاصِفَةٌ شَمْسِيَّةٌ، رُبَّمَا؟ طَقْسُ الفَضَاءِ يَؤَثِّرُ عَلَى التِّكْنُولُوجِيَا أَحْيَانًا.\"",
-                            3: "رَمَشْتُ. طَقْسُ الفَضَاءِ؟ ظَنَنْتُ أَنَّ هَذَا مُجَرَّدُ شَيْءٍ مِنْ حِصَّةِ العُلُومِ: الاِنْفِجَارَاتُ الشَّمْسِيَّةُ، الاِنْبِعَاثَاتُ الكُتَلِيَّةُ الإِكْلِيلِيَّةُ—ثَوْرَانَاتٌ عِمْلَاقَةٌ مِنَ الشَّمْسِ، تَقْذِفُ البْلَازْمَا وَالطَّاقَةَ عَبْرَ الفَضَاءِ. هَلْ يُمْكِنُ أَنْ يَصِلَ ذَلِكَ إِلَيْنَا حَقًّا هُنَا؟",
-                            4: "سَحَبْتُ تَنْبِيهَ طَقْسِ الفَضَاءِ الخَاصَّ بِوَكَالَةِ نَاسَا. وَمَضَتِ الصَّفْحَةُ: \"اِنْبِعَاثٌ كُتَلِيٌّ إِكْلِيلِيٌّ كَبِيرٌ\". \"عَاصِفَةٌ مَغْنَاطِيسِيَّةٌ أَرْضِيَّةٌ مُحْتَمَلَةٌ اللَّيْلَةَ\". ظَهَرَتْ نَافِذَةٌ مُنْبَثِقَةٌ فِي تَطْبِيقِ الفَلَكِ المُفَضَّلِ لَدَيَّ: \"تَتَبُّعُ الأَقْمَارِ الصِّنَاعِيَّةِ غَيْرُ مُتَّصِلٍ بِالإِنْتَرْنِتِ بِسَبَبِ زِيَادَةِ النَّشَاطِ الشَّمْسِيِّ.\"",
-                            5: "شَرَحَ أَبِي: \"الاِنْبِعَاثَاتُ الكُتَلِيَّةُ الإِكْلِيلِيَّةُ (CME) مِثْلُ الغُيُومِ العِمْلَاقَةِ مِنَ الجُسَيْمَاتِ المَشْحُونَةِ القَادِمَةِ مِنَ الشَّمْسِ. عِنْدَمَا تَصِلُ إِلَى الأَرْضِ، فَإِنَّهَا تُحْدِثُ فَوْضَى فِي خُطُوطِ الكَهْرَبَاءِ، وَنِظَامِ تَحْدِيدِ المَوَاقِعِ العَالَمِيِّ (GPS)، وَحَتَّى التِّلِسْكُوبَاتِ. عَادَةً مَا يَحْمِينَا المَجَالُ المَغْنَاطِيسِيُّ لِلْأَرْضِ، لَكِنَّ اللَّيْلَةَ يَتَعَرَّضُ لِضَرْبَةٍ قَوِيَّةٍ.\"",
-                            6: "رَاسَلْتُ مَجْمُوعَةَ الدَّرْدَشَةِ الخَاصَّةَ بِنَادِي الفَلَكِ. أَجَابَتْ زُوي: \"شَبَكَةُ الوَايْ فَايْ الخَاصَّةُ بِي مُعَطَّلَةٌ. وَتَقُولُ جَيْمِي إِنَّ تِلِسْكُوبَهَا يَتَصَرَّفُ بِغَرَابَةٍ أَيْضًا. هَلْ هَذَا هُوَ السَّبَبُ فِي ظُهُورِ الأَضْوَاءِ الشَّمَالِيَّةِ أَحْيَانًا فِي مَنَاطِقَ أَبْعَدَ جَنُوبًا؟\" اِبْتَسَمْتُ، وَأَنَا أُفَكِّرُ كَيْفَ أَنَّ طَقْسَ الفَضَاءِ لَيْسَ مُجَرَّدَ مَوْضُوعٍ عِلْمِيٍّ—إِنَّهُ شَيْءٌ يَرْبِطُنَا جَمِيعًا.",
-                            7: "بَدَلًا مِنَ الشُّعُورِ بِالهَزِيمَةِ، قَلَّبْتُ خَرَائِطِي النَّجْمِيَّةَ الوَرَقِيَّةَ القَدِيمَةَ وَوَجَدْتُ كَوْكَبَةَ الجَبَّارِ. وَجَّهْتُ تِلِسْكُوبِي يَدَوِيًّا، وَرَسَمْتُ مَا اسْتَطَعْتُ بِاليَدِ. اللَّيْلَةَ، لَمْ تَكُنِ السَّمَاءُ مُجَرَّدَ نُجُومٍ—لَقَدْ كَانَتْ تَذْكِيرًا بِكَيْفَ يُمْكِنُ لِقُوَّةِ الشَّمْسِ أَنْ تَصِلَ عَبْرَ 150 مِلْيُونَ كِيلُومِتْرٍ وَتَلْمُسَ رُكْنِي الصَّغِيرَ عَلَى الأَرْضِ.",
-                            8: "بَيْنَمَا اسْتَمَرَّتِ العَاصِفَةُ المَغْنَاطِيسِيَّةُ الأَرْضِيَّةُ، حَدَّقْتُ فِي السَّمَاءِ. عَلَى الرَّغْمِ مِنْ تَعَطُّلِ تِكْنِيَّتِي، شَعَرْتُ بِاتِّصَالٍ جَدِيدٍ بِالكَوْنِ. فِي مَكَانٍ مَا، رُبَّمَا تَحْتَرِقُ الأَضْوَاءُ الشَّفَقِيَّةُ سَاطِعَةً—وَرُبَّمَا تَكُونُ مَرْئِيَّةً حَتَّى مِنْ مَدِينَتِنَا إِذَا كَانَتِ العَاصِفَةُ الشَّمْسِيَّةُ قَوِيَّةً بِمَا فِيهِ الكِفَايَةُ.",
-                            9: "غَدًا، سَيَعُودُ كُلُّ شَيْءٍ إِلَى طَبِيعَتِهِ—الهَاتِفُ، التِّلِسْكُوبُ، الإِنْتَرْنِتُ. لَكِنَّنِي الآنَ فَهِمْتُ: دِرَاسَةُ النُّجُومِ لَيْسَتْ مُجَرَّدَ نَظَرٍ إِلَى الخَارِجِ. إِنَّهَا تَتَعَلَّقُ بِتَعَلُّمِ كَيْفَ تَتَحَدَّثُ الشَّمْسُ وَالأَرْضُ دَائِمًا مَعًا، تُرْسِلَانِ الإِشَارَاتِ وَالعَوَاصِفَ، وَتَرْبِطَانِ كُلَّ فَلَكِيٍّ تَحْتَ السَّمَاءِ."
-                        }
-                    }
-                };
-
-                const language = isArabic ? 'ar' : 'en';
-                const levelTexts = textContent[selectedLevel];
-                
-                if (levelTexts && levelTexts[language]) {
-                    return levelTexts[language][pageIndex] || '';
-                }
-                
-                const fallbackTexts = textContent['curious'][language];
-                return fallbackTexts ? (fallbackTexts[pageIndex] || '') : '';
-            }
-
-            updateDisplay() {
-                this.prevBtn.disabled = this.currentSpread <= -1;
-                this.nextBtn.disabled = this.currentSpread >= this.totalSpreads - 1;
-
-                const isArabic = document.getElementById('arabicBtn')?.classList.contains('active');
-                this.flipbook.classList.toggle('rtl', isArabic);
-
-                if (this.currentSpread === -1) {
-                    this.pageCounter.textContent = `Cover / ${this.totalPages}`;
-                    this.endOptions.style.display = 'none';
-                } else {
-                    const leftIdx = this.currentSpread * 2 + 1;
-                    const rightIdx = leftIdx + 1;
-                    const displayRight = rightIdx < this.totalPages ? rightIdx : leftIdx;
-                    this.pageCounter.textContent = `${leftIdx + 1} — ${displayRight + 1} / ${this.totalPages}`;
-
-                    const lastPageIdx = this.totalPages - 1;
-                    const onLastSpread = leftIdx === lastPageIdx || rightIdx === lastPageIdx;
-                    this.endOptions.style.display = onLastSpread ? 'flex' : 'none';
-                }
-            }
-
-            goBackToHome() {
-                this.flipbook.style.transition = 'opacity 0.5s ease-out';
-                this.flipbook.style.opacity = '0';
-                setTimeout(() => {
-                    this.flipbook.style.display = 'none';
-                    this.flipbook.style.opacity = '1';
-                    this.flipbook.style.transition = '';
-                    const levelPage = document.getElementById('levelPage');
-                    levelPage.style.display = 'flex';
-                    levelPage.style.opacity = '0';
-                    levelPage.style.transition = 'opacity 0.5s ease-in';
-                    setTimeout(() => {
-                        levelPage.style.opacity = '1';
-                        setTimeout(() => { levelPage.style.transition = ''; }, 500);
-                    }, 50);
-                }, 500);
-            }
-
-            refreshForLanguageChange() {
-                this.bookPages = getBookPages();
-                this.totalPages = this.bookPages.length;
-                this.totalSpreads = Math.ceil((this.totalPages - 1) / 2);
-                this.currentSpread = -1;
-                this.pageFlip.style.transition = 'none';
-                this.flipToggle.checked = false;
-                void this.pageFlip.offsetHeight;
-                this.pageFlip.style.transition = '';
-                this.showSpread(-1);
-            }
-
-            goToQuiz() {
-                const selectedLevel = window.selectedLevel || 'curious';
-                this.flipbook.style.transition = 'opacity 0.5s ease-out';
-                this.flipbook.style.opacity = '0';
-                setTimeout(() => {
-                    this.flipbook.style.display = 'none';
-                    this.flipbook.style.opacity = '1';
-                    this.flipbook.style.transition = '';
-                    showQuizPage(selectedLevel);
-                }, 500);
-            }
-        }
-
         // ========================================
         // INITIALIZE THE APPLICATION
         // ========================================
         
-        // Wait for the page to load, then start the flipbook
+        // Wait for the page to load, then start the application
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize home page functionality
             initializeHomePage();
             
-            console.log('📖 Flipbook system initialized with level-based pages');
-            console.log('🎯 Ready to display your images!');
+            console.log('📖 Application initialized');
         });
 
         // ========================================
@@ -1751,7 +931,7 @@
         
         function initializeHomePage() {
             const homePage = document.getElementById('homePage');
-            const flipbook = document.getElementById('flipbook');
+            const emptyPage = document.getElementById('emptyPage');
             const readButton = document.getElementById('readButton');
             const quizButton = document.getElementById('quizButton');
             const englishBtn = document.getElementById('englishBtn');
@@ -1768,7 +948,7 @@
             homePage.style.display = 'flex';
             homePage.style.opacity = '1';
             homePage.style.visibility = 'visible';
-            flipbook.style.display = 'none';
+            emptyPage.style.display = 'none';
             
             console.log('Home page initialized'); // Debug log
             console.log('Read button:', readButton); // Debug log
@@ -1812,9 +992,9 @@
                     console.log('🌐 Switched to English language');
                 }
                 
-                // Refresh flipbook if it's currently open
-                if (window.flipbookApp && document.getElementById('flipbook').style.display !== 'none') {
-                    window.flipbookApp.refreshForLanguageChange();
+                // Refresh empty page if it's currently open
+                if (document.getElementById('emptyPage').style.display !== 'none') {
+                    // Just refresh language display on empty page
                 }
             }
             
@@ -1870,7 +1050,7 @@
             
             // Add back to home functionality (optional)
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && flipbook.style.display !== 'none') {
+                if (e.key === 'Escape' && document.getElementById('emptyPage').style.display !== 'none') {
                     goBackToHome();
                 }
             });
@@ -1924,7 +1104,7 @@
 
         function showLevelSelection() {
             const levelPage = document.getElementById('levelPage');
-            const flipbook = document.getElementById('flipbook');
+            const emptyPage = document.getElementById('emptyPage');
             const backToHomeBtn = document.getElementById('backToHomeFromLevel');
             
             // Show level selection page
@@ -1943,23 +1123,19 @@
                     const level = card.getAttribute('data-level');
                     window.selectedLevel = level;
                     
-                    // Hide level page and show flipbook
+                    // Hide level page and show empty page
                     levelPage.style.transition = 'opacity 0.5s ease-out';
                     levelPage.style.opacity = '0';
                     
                     setTimeout(() => {
                         levelPage.style.display = 'none';
-                        flipbook.style.display = 'block';
+                        emptyPage.style.display = 'block';
                         
-                        // Initialize the flipbook application
-                        window.flipbook = new FlipbookApp();
-                        window.flipbookApp = window.flipbook;
-                        
-                        // Fade in the flipbook
-                        flipbook.style.opacity = '0';
-                        flipbook.style.transition = 'opacity 0.5s ease-in';
+                        // Fade in the empty page
+                        emptyPage.style.opacity = '0';
+                        emptyPage.style.transition = 'opacity 0.5s ease-in';
                         setTimeout(() => {
-                            flipbook.style.opacity = '1';
+                            emptyPage.style.opacity = '1';
                         }, 50);
                     }, 500);
                 });
@@ -1985,6 +1161,24 @@
                 setTimeout(() => {
                     levelPage.style.display = 'none';
                     goBackToHome();
+                }, 500);
+            });
+
+            // Empty page back button
+            const backFromEmptyPage = document.getElementById('backFromEmptyPage');
+            backFromEmptyPage.addEventListener('click', () => {
+                emptyPage.style.transition = 'opacity 0.5s ease-out';
+                emptyPage.style.opacity = '0';
+                setTimeout(() => {
+                    emptyPage.style.display = 'none';
+                    emptyPage.style.opacity = '1';
+                    emptyPage.style.transition = '';
+                    levelPage.style.display = 'flex';
+                    levelPage.style.opacity = '0';
+                    levelPage.style.transition = 'opacity 0.5s ease-in';
+                    setTimeout(() => {
+                        levelPage.style.opacity = '1';
+                    }, 50);
                 }, 500);
             });
         }
@@ -2681,13 +1875,13 @@
         
         function goBackToHome() {
             const homePage = document.getElementById('homePage');
-            const flipbook = document.getElementById('flipbook');
+            const emptyPage = document.getElementById('emptyPage');
             
-            flipbook.style.transition = 'opacity 0.5s ease-out';
-            flipbook.style.opacity = '0';
+            emptyPage.style.transition = 'opacity 0.5s ease-out';
+            emptyPage.style.opacity = '0';
             
             setTimeout(() => {
-                flipbook.style.display = 'none';
+                emptyPage.style.display = 'none';
                 homePage.style.display = 'flex';
                 homePage.style.opacity = '0';
                 homePage.style.transition = 'opacity 0.5s ease-in';
@@ -3052,16 +2246,11 @@
             if (levelPages[selectedLevel] && levelPages[selectedLevel][currentLanguage]) {
                 levelPages[selectedLevel][currentLanguage].push(imageSrc);
             }
-            
-            if (window.flipbook) {
-                window.flipbook.refreshForLanguageChange();
-            }
         }
 
         // Function to change book title (call from browser console if needed)
         function changeTitle(newTitle) {
-            const titleEl = document.getElementById('bookTitle');
-            if (titleEl) titleEl.textContent = newTitle;
+            // No-op: flipbook removed
         }
     </script>
 </body>
