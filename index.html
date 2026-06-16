@@ -439,23 +439,32 @@
 
         /* ========== FOUNDATION FLIPBOOK STYLES ========== */
 
-        .empty-page .book-cover {
-            position: absolute;
-            inset: 0;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 1;
-            pointer-events: auto;
-            transition: opacity 0.5s ease;
-            background-color: var(--page-bg);
+        .empty-page .book-toggle {
+            display: none;
         }
 
-        .empty-page .book-cover.hiding {
-            opacity: 0;
-            pointer-events: none;
+        .empty-page .book-toggle:not(:checked) ~ .book .book__page--1 {
+            width: 100%;
+        }
+
+        .empty-page .book-toggle:not(:checked) ~ .book .book__page--4,
+        .empty-page .book-toggle:not(:checked) ~ .book .book__page--2 {
+            display: none;
+        }
+
+        .empty-page .book-toggle:checked ~ .book .book__page--1 {
+            width: 50%;
+        }
+
+        .empty-page .book-toggle:checked ~ .book .book__page--4,
+        .empty-page .book-toggle:checked ~ .book .book__page--2 {
+            display: block;
+        }
+
+        .empty-page .book__page--1 {
+            cursor: pointer;
+            overflow: hidden;
+            transition: width 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
         }
 
         .empty-page .cover {
@@ -487,15 +496,10 @@
             background-image: linear-gradient(-90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
         }
 
-        .empty-page .book__page--1 {
-            cursor: pointer;
-            overflow: hidden;
-        }
-
         .empty-page .book__page--1 img {
             width: 100%;
-            max-width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
         }
 
         .empty-page .book__page--2 {
@@ -1048,10 +1052,10 @@
             <span class="back-home-en">← Back</span>
             <span class="back-home-ar" style="display: none;">← رجوع</span>
         </button>
-        <div class="book-cover" id="bookCover"></div>
         <div class="cover">
+            <input type="checkbox" id="bookToggle" class="book-toggle" onchange="if(!this.checked) document.getElementById('page-1').checked=true">
             <div class="book">
-                <label for="page-1" class="book__page book__page--1">
+                <label for="bookToggle" class="book__page book__page--1">
                     <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/193203/1111.jpg" alt="">
                 </label>
 
@@ -1397,15 +1401,8 @@
                         levelPage.style.display = 'none';
                         emptyPage.style.display = 'block';
                         
-                        // Init cover overlay
-                        const bookCover = document.getElementById('bookCover');
-                        bookCover.style.backgroundImage = "url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/193203/1111.jpg')";
-                        bookCover.classList.remove('hiding');
-                        bookCover.style.opacity = '1';
-                        bookCover.style.pointerEvents = 'auto';
-                        
-                        // Reset radio to uncheck page-2 (close the book)
-                        document.getElementById('page-1').checked = true;
+                        // Close the book cover (uncheck toggle) so cover page shows full
+                        document.getElementById('bookToggle').checked = false;
                         
                         // Fade in the empty page
                         emptyPage.style.opacity = '0';
@@ -1456,12 +1453,6 @@
                         levelPage.style.opacity = '1';
                     }, 50);
                 }, 500);
-            });
-
-            // Cover overlay click — open the book
-            const bookCover = document.getElementById('bookCover');
-            bookCover.addEventListener('click', () => {
-                bookCover.classList.add('hiding');
             });
         }
 
