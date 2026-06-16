@@ -439,57 +439,47 @@
 
         /* ========== FOUNDATION FLIPBOOK STYLES ========== */
 
-        .empty-page .book-toggle {
-            display: none;
+        .empty-page .cover {
+            position: relative;
+            width: calc(var(--baseline) * 60);
+            box-shadow: 0 0 100px rgba(0, 0, 0, .3);
+            transition: aspect-ratio 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
         }
 
-        .empty-page .book-toggle:not(:checked) ~ .book .book__page--1 {
+        .empty-page .book-toggle:not(:checked) + .cover {
+            aspect-ratio: 1 / 1;
+        }
+
+        .empty-page .book-toggle:checked + .cover {
+            aspect-ratio: 2 / 1;
+        }
+
+        .empty-page .book-toggle:not(:checked) ~ .cover .book .book__page--1 {
             width: 100%;
         }
 
-        .empty-page .book-toggle:not(:checked) ~ .book .book__page--4,
-        .empty-page .book-toggle:not(:checked) ~ .book .book__page--2 {
+        .empty-page .book-toggle:not(:checked) ~ .cover .book .book__page--4,
+        .empty-page .book-toggle:not(:checked) ~ .cover .book .book__page--2 {
             display: none;
         }
 
-        .empty-page .book-toggle:checked ~ .book .book__page--1 {
+        .empty-page .book-toggle:checked ~ .cover .book .book__page--1 {
             width: 50%;
         }
 
-        .empty-page .book-toggle:checked ~ .book .book__page--4,
-        .empty-page .book-toggle:checked ~ .book .book__page--2 {
+        .empty-page .book-toggle:checked ~ .cover .book .book__page--4,
+        .empty-page .book-toggle:checked ~ .cover .book .book__page--2 {
             display: block;
+        }
+
+        .empty-page .book-toggle {
+            display: none;
         }
 
         .empty-page .book__page--1 {
             cursor: pointer;
             overflow: hidden;
             transition: width 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
-        }
-
-        .empty-page .cover {
-            width: calc(var(--baseline) * 60);
-            aspect-ratio: 2 / 1;
-            box-shadow: 0 0 100px rgba(0, 0, 0, .3);
-        }
-
-        .empty-page .book {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            perspective: 1200px;
-        }
-
-        .empty-page .book__page {
-            position: relative;
-            width: 50%;
-            height: 100%;
-            display: grid;
-            transform: rotateY(0deg);
-            transition: transform 0.9s cubic-bezier(0.645, 0.045, 0.355, 1);
-            transform-origin: 0% 0%;
-            background-color: var(--page-bg);
-            background-image: linear-gradient(90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
         }
 
         .empty-page .book__page:nth-of-type(1) {
@@ -1054,7 +1044,7 @@
         </button>
         <div class="cover">
             <input type="checkbox" id="bookToggle" class="book-toggle" onchange="if(!this.checked) document.getElementById('page-1').checked=true">
-            <div class="book">
+        <div class="cover">
                 <label for="bookToggle" class="book__page book__page--1">
                     <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/193203/1111.jpg" alt="">
                 </label>
