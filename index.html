@@ -416,7 +416,7 @@
             position: relative;
             width: calc(var(--baseline) * 60);
             max-width: 94vw;
-            height: calc(var(--baseline) * 42.6);
+            aspect-ratio: 1;
             box-shadow: 0 0 100px rgba(0, 0, 0, 0.3);
             display: none;
             background: var(--body-bg);
@@ -484,12 +484,13 @@
             z-index: 1;
         }
 
-        .book__page--1 img {
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
+        .book__page--1,
+        .book__page--4,
+        .book__page-front,
+        .book__page-back {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .book__page--2 {
@@ -504,7 +505,10 @@
             z-index: 2;
         }
 
-        .book__page--2.flipping {
+        .flip-toggle {
+            display: none;
+        }
+        .flip-toggle:checked + .book__page--2 {
             transform: rotateY(-180deg);
         }
 
@@ -533,23 +537,6 @@
             background-image: linear-gradient(-90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
         }
 
-        .page__content {
-            padding: var(--baseline);
-            height: 100%;
-            position: relative;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .page__content img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
         .page__number {
             position: absolute;
             bottom: var(--baseline);
@@ -560,8 +547,9 @@
             text-align: center;
             color: var(--dark-text);
             font-weight: 400;
-            opacity: 0.6;
+            opacity: 0.8;
             pointer-events: none;
+            text-shadow: 0 1px 3px rgba(255,255,255,0.6), 0 0 6px rgba(255,255,255,0.4);
         }
 
         /* ── Navigation corner buttons ── */
@@ -667,7 +655,7 @@
             transform-origin: 100% 0%;
             background-image: linear-gradient(-90deg, rgba(227,227,227,1) 0%, rgba(247,247,247,0) 18%);
         }
-        .cover.rtl .book__page--2.flipping {
+        .cover.rtl .flip-toggle:checked + .book__page--2 {
             transform: rotateY(180deg);
         }
         .cover.rtl .book__page--1 {
@@ -921,8 +909,11 @@
 
         /* High DPI displays */
         @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .book__page--1 img,
-            .book__page--2 .page__content img {
+            .book__page--1,
+            .book__page--2,
+            .book__page--4,
+            .book__page-front,
+            .book__page-back {
                 image-rendering: -webkit-optimize-contrast;
                 image-rendering: crisp-edges;
             }
@@ -1106,30 +1097,21 @@
         <div class="book">
             <!-- Left page (static) -->
             <div class="book__page book__page--1" id="pageLeft">
-                <img id="leftImg" alt="" />
                 <div class="page__number" id="leftNum">1</div>
             </div>
 
             <!-- Right content page (hidden behind overlay) -->
             <div class="book__page book__page--4" id="pageRight">
-                <div class="page__content">
-                    <img id="rightImg" alt="" />
-                </div>
                 <div class="page__number" id="rightNum">2</div>
             </div>
 
+            <input type="checkbox" id="flipToggle" class="flip-toggle" autocomplete="off">
             <!-- Flipping overlay (absolute, covers right half) -->
             <div class="book__page book__page--2" id="pageFlip">
                 <div class="book__page-front">
-                    <div class="page__content">
-                        <img id="frontImg" alt="" />
-                    </div>
                     <div class="page__number" id="frontNum">2</div>
                 </div>
                 <div class="book__page-back">
-                    <div class="page__content">
-                        <img id="backImg" alt="" />
-                    </div>
                     <div class="page__number" id="backNum">3</div>
                 </div>
             </div>
@@ -1313,15 +1295,15 @@
                 
                 this.bookPages = currentBookPages;
                 this.totalPages = currentBookPages.length;
-                this.currentSpread = 0;
-                this.totalSpreads = Math.ceil(this.totalPages / 2);
+                this.currentSpread = -1;  // -1 = cover
+                this.totalSpreads = Math.ceil((this.totalPages - 1) / 2);
                 this.isAnimating = false;
                 this.touchStartX = 0;
                 this.touchEndX = 0;
                 this.touchStartTime = 0;
                 
                 this.initializeElements();
-                this.showSpread(0);
+                this.showSpread(-1);
                 this.setupEventListeners();
                 this.updateDisplay();
             }
@@ -1331,10 +1313,11 @@
                 this.pageLeft = document.getElementById('pageLeft');
                 this.pageRight = document.getElementById('pageRight');
                 this.pageFlip = document.getElementById('pageFlip');
-                this.leftImg = document.getElementById('leftImg');
-                this.rightImg = document.getElementById('rightImg');
-                this.frontImg = document.getElementById('frontImg');
-                this.backImg = document.getElementById('backImg');
+                this.flipToggle = document.getElementById('flipToggle');
+                this.leftPage = document.getElementById('pageLeft');
+                this.rightPage = document.getElementById('pageRight');
+                this.pageFront = document.querySelector('.book__page-front');
+                this.pageBack = document.querySelector('.book__page-back');
                 this.leftNum = document.getElementById('leftNum');
                 this.rightNum = document.getElementById('rightNum');
                 this.frontNum = document.getElementById('frontNum');
@@ -1349,37 +1332,45 @@
                 this.bookTitle = document.getElementById('bookTitle');
             }
 
-            setImage(img, idx) {
+            setPageImage(el, idx) {
                 if (idx < this.totalPages) {
-                    img.src = this.bookPages[idx];
-                    img.alt = `Page ${idx + 1}`;
+                    el.style.backgroundImage = `url(${this.bookPages[idx]})`;
                     return true;
                 }
-                img.src = '';
-                img.alt = '';
+                el.style.backgroundImage = 'none';
                 return false;
             }
 
             showSpread(spreadIndex) {
-                const leftIdx = spreadIndex * 2;
-                const rightIdx = leftIdx + 1;
-                const backIdx = leftIdx + 2;
+                let leftIdx, rightIdx, backIdx;
 
-                this.setImage(this.leftImg, leftIdx);
-                this.leftNum.textContent = leftIdx + 1;
+                if (spreadIndex === -1) {
+                    leftIdx = 0;
+                    rightIdx = 0;
+                    backIdx = 1;
+                } else {
+                    leftIdx = spreadIndex * 2 + 1;
+                    rightIdx = leftIdx + 1;
+                    backIdx = leftIdx + 2;
+                }
 
-                this.setImage(this.frontImg, rightIdx);
-                this.frontNum.textContent = rightIdx < this.totalPages ? rightIdx + 1 : '';
+                this.setPageImage(this.leftPage, leftIdx);
+                this.leftNum.textContent = spreadIndex === -1 ? '' : leftIdx + 1;
 
-                this.setImage(this.backImg, backIdx);
+                this.setPageImage(this.pageFront, rightIdx);
+                this.frontNum.textContent = (spreadIndex === -1 || rightIdx >= this.totalPages) ? '' : rightIdx + 1;
+
+                this.setPageImage(this.pageBack, backIdx);
                 this.backNum.textContent = backIdx < this.totalPages ? backIdx + 1 : '';
 
-                this.setImage(this.rightImg, rightIdx);
-                this.rightNum.textContent = rightIdx < this.totalPages ? rightIdx + 1 : '';
+                this.setPageImage(this.rightPage, rightIdx);
+                this.rightNum.textContent = (spreadIndex === -1 || rightIdx >= this.totalPages) ? '' : rightIdx + 1;
 
-                // Reset overlay to unflipped (remove inline styles so CSS class takes over)
-                this.pageFlip.classList.remove('flipping');
-                this.pageFlip.style.transform = '';
+                // Reset overlay to unflipped
+                this.pageFlip.style.transition = 'none';
+                this.flipToggle.checked = false;
+                void this.pageFlip.offsetHeight;
+                this.pageFlip.style.transition = '';
 
                 this.currentSpread = spreadIndex;
                 this.updateDisplay();
@@ -1430,69 +1421,119 @@
             }
 
             nextPage() {
-                if (this.isAnimating || this.currentSpread >= this.totalSpreads - 1) return;
+                if (this.isAnimating) return;
+
+                if (this.currentSpread === -1) {
+                    this.isAnimating = true;
+
+                    this.setPageImage(this.pageBack, 1);
+                    this.backNum.textContent = '1';
+
+                    this.setPageImage(this.rightPage, 2);
+                    this.rightNum.textContent = '2';
+
+                    this.flipToggle.checked = true;
+
+                    const onFlipEnd = () => {
+                        this.pageFlip.removeEventListener('transitionend', onFlipEnd);
+
+                        this.setPageImage(this.leftPage, 1);
+                        this.leftNum.textContent = '1';
+                        this.setPageImage(this.pageFront, 2);
+                        this.frontNum.textContent = '2';
+
+                        this.pageFlip.style.transition = 'none';
+                        this.flipToggle.checked = false;
+                        void this.pageFlip.offsetHeight;
+                        this.pageFlip.style.transition = '';
+
+                        this.currentSpread = 0;
+                        this.updateDisplay();
+                        this.isAnimating = false;
+                    };
+                    this.pageFlip.addEventListener('transitionend', onFlipEnd, { once: true });
+                    return;
+                }
+
+                if (this.currentSpread >= this.totalSpreads - 1) return;
                 this.isAnimating = true;
 
                 const nextSpread = this.currentSpread + 1;
-                const backIdx = nextSpread * 2;
-                const nextRight = nextSpread * 2 + 1;
+                const backIdx = nextSpread * 2 + 1;
+                const nextRight = nextSpread * 2 + 2;
 
-                // Pre-set back face to next spread's left
-                this.setImage(this.backImg, backIdx);
+                this.setPageImage(this.pageBack, backIdx);
                 this.backNum.textContent = backIdx < this.totalPages ? backIdx + 1 : '';
 
-                // Pre-set page-4 (hidden behind overlay) to next spread's right
-                this.setImage(this.rightImg, nextRight);
+                this.setPageImage(this.rightPage, nextRight);
                 this.rightNum.textContent = nextRight < this.totalPages ? nextRight + 1 : '';
 
-                this.pageFlip.classList.add('flipping');
+                this.flipToggle.checked = true;
 
-                setTimeout(() => {
-                    // After flip: set all images for the new spread
-                    this.setImage(this.leftImg, backIdx);
+                const onFlipEnd = () => {
+                    this.pageFlip.removeEventListener('transitionend', onFlipEnd);
+
+                    this.setPageImage(this.leftPage, backIdx);
                     this.leftNum.textContent = backIdx + 1;
 
-                    this.setImage(this.frontImg, nextRight);
+                    this.setPageImage(this.pageFront, nextRight);
                     this.frontNum.textContent = nextRight < this.totalPages ? nextRight + 1 : '';
 
-                    // Snap overlay back to unflipped (no transition)
                     this.pageFlip.style.transition = 'none';
-                    this.pageFlip.style.transform = '';
-                    this.pageFlip.classList.remove('flipping');
+                    this.flipToggle.checked = false;
                     void this.pageFlip.offsetHeight;
                     this.pageFlip.style.transition = '';
 
                     this.currentSpread = nextSpread;
                     this.updateDisplay();
                     this.isAnimating = false;
-                }, 900);
+                };
+                this.pageFlip.addEventListener('transitionend', onFlipEnd, { once: true });
             }
 
             previousPage() {
-                if (this.isAnimating || this.currentSpread <= 0) return;
+                if (this.isAnimating || this.currentSpread <= -1) return;
                 this.isAnimating = true;
 
+                if (this.currentSpread === 0) {
+                    this.setPageImage(this.leftPage, 0);
+                    this.leftNum.textContent = '';
+                    this.setPageImage(this.pageFront, 0);
+                    this.frontNum.textContent = '';
+                    this.setPageImage(this.pageBack, 1);
+                    this.backNum.textContent = '';
+                    this.setPageImage(this.rightPage, 0);
+                    this.rightNum.textContent = '';
+
+                    this.pageFlip.style.transition = 'none';
+                    this.flipToggle.checked = false;
+                    void this.pageFlip.offsetHeight;
+                    this.pageFlip.style.transition = '';
+
+                    this.currentSpread = -1;
+                    this.updateDisplay();
+                    this.isAnimating = false;
+                    return;
+                }
+
                 const prevSpread = this.currentSpread - 1;
-                const prevLeft = prevSpread * 2;
+                const prevLeft = prevSpread * 2 + 1;
                 const prevRight = prevLeft + 1;
 
-                // Update all images to previous spread
-                this.setImage(this.leftImg, prevLeft);
+                this.setPageImage(this.leftPage, prevLeft);
                 this.leftNum.textContent = prevLeft + 1;
 
-                this.setImage(this.frontImg, prevRight);
+                this.setPageImage(this.pageFront, prevRight);
                 this.frontNum.textContent = prevRight < this.totalPages ? prevRight + 1 : '';
 
-                this.setImage(this.backImg, prevRight);
+                this.setPageImage(this.pageBack, prevRight);
                 this.backNum.textContent = prevRight < this.totalPages ? prevRight + 1 : '';
 
-                this.setImage(this.rightImg, prevRight);
+                this.setPageImage(this.rightPage, prevRight);
                 this.rightNum.textContent = prevRight < this.totalPages ? prevRight + 1 : '';
 
-                // Snap overlay to unflipped instantly (no animation for back direction)
                 this.pageFlip.style.transition = 'none';
-                this.pageFlip.style.transform = '';
-                this.pageFlip.classList.remove('flipping');
+                this.flipToggle.checked = false;
                 void this.pageFlip.offsetHeight;
                 this.pageFlip.style.transition = '';
 
@@ -1507,7 +1548,7 @@
                     return;
                 }
                 const isArabic = document.getElementById('arabicBtn')?.classList.contains('active');
-                const leftIdx = this.currentSpread * 2;
+                const leftIdx = this.currentSpread === -1 ? 0 : this.currentSpread * 2 + 1;
                 const text = this.getPageText(leftIdx, isArabic);
                 if (!text) return;
                 const u = new SpeechSynthesisUtterance(text);
@@ -1585,20 +1626,25 @@
             }
 
             updateDisplay() {
-                this.prevBtn.disabled = this.currentSpread <= 0;
+                this.prevBtn.disabled = this.currentSpread <= -1;
                 this.nextBtn.disabled = this.currentSpread >= this.totalSpreads - 1;
-
-                const leftIdx = this.currentSpread * 2;
-                const rightIdx = leftIdx + 1;
-                const displayRight = rightIdx < this.totalPages ? rightIdx : leftIdx;
-                this.pageCounter.textContent = `${leftIdx + 1} — ${displayRight + 1} / ${this.totalPages}`;
 
                 const isArabic = document.getElementById('arabicBtn')?.classList.contains('active');
                 this.flipbook.classList.toggle('rtl', isArabic);
 
-                const lastPageIdx = this.totalPages - 1;
-                const onLastSpread = leftIdx === lastPageIdx || rightIdx === lastPageIdx;
-                this.endOptions.style.display = onLastSpread ? 'flex' : 'none';
+                if (this.currentSpread === -1) {
+                    this.pageCounter.textContent = `Cover / ${this.totalPages}`;
+                    this.endOptions.style.display = 'none';
+                } else {
+                    const leftIdx = this.currentSpread * 2 + 1;
+                    const rightIdx = leftIdx + 1;
+                    const displayRight = rightIdx < this.totalPages ? rightIdx : leftIdx;
+                    this.pageCounter.textContent = `${leftIdx + 1} — ${displayRight + 1} / ${this.totalPages}`;
+
+                    const lastPageIdx = this.totalPages - 1;
+                    const onLastSpread = leftIdx === lastPageIdx || rightIdx === lastPageIdx;
+                    this.endOptions.style.display = onLastSpread ? 'flex' : 'none';
+                }
             }
 
             goBackToHome() {
@@ -1622,14 +1668,13 @@
             refreshForLanguageChange() {
                 this.bookPages = getBookPages();
                 this.totalPages = this.bookPages.length;
-                this.totalSpreads = Math.ceil(this.totalPages / 2);
-                this.currentSpread = 0;
+                this.totalSpreads = Math.ceil((this.totalPages - 1) / 2);
+                this.currentSpread = -1;
                 this.pageFlip.style.transition = 'none';
-                this.pageFlip.style.transform = '';
-                this.pageFlip.classList.remove('flipping');
+                this.flipToggle.checked = false;
                 void this.pageFlip.offsetHeight;
                 this.pageFlip.style.transition = '';
-                this.showSpread(0);
+                this.showSpread(-1);
             }
 
             goToQuiz() {
