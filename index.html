@@ -272,6 +272,173 @@
             transform: translateY(-2px) scale(1.1);
         }
 
+        /* ========== 3D Book styles for level selection ========== */
+        .level-book {
+            position: relative;
+            width: 220px;
+            height: 300px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            flex-shrink: 0;
+        }
+
+        .level-book .book-cover {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: rotateX(53deg) rotateZ(-37deg);
+            transition:
+                transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1),
+                translate 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
+            translate: 0 0 0;
+            will-change: transform;
+        }
+
+        .level-book .book-cover .front {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px 8px 8px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+        }
+
+        .level-book .book-cover .front::after {
+            content: '';
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .level-book .book-cover .front .book-icon {
+            font-size: 2.2em;
+            opacity: 0.9;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+            margin-bottom: 2px;
+        }
+
+        .level-book .book-cover .front .book-age {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 0.5px;
+        }
+
+        .level-book .book-cover .front .book-title-text {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            text-align: center;
+            line-height: 1.3;
+            letter-spacing: 0.5px;
+        }
+
+        .level-book .book-cover .front .book-story {
+            font-size: 0.75em;
+            font-style: italic;
+            color: rgba(255,255,255,0.7);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .level-book .book-cover .front .open-hint {
+            font-size: 0.6em;
+            color: rgba(255,255,255,0.5);
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .level-book .book-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 100%;
+            width: 28px;
+            height: 100%;
+            transform-origin: left top;
+            transform: skewY(53deg);
+            border-radius: 0 4px 4px 0;
+            z-index: 1;
+            transition: transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
+        }
+
+        .level-book .book-cover::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 28px;
+            transform-origin: left top;
+            transform: skewX(37deg);
+            border-radius: 0 0 4px 4px;
+            z-index: 1;
+            transition: transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
+        }
+
+        .level-book:hover .book-cover {
+            transform: rotateX(53deg) rotateZ(-37deg) translateY(-6px);
+            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.25));
+        }
+
+        .level-book:active .book-cover {
+            transform: rotateX(53deg) rotateZ(-37deg) translateY(-3px);
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+        }
+
+        .level-book.open .book-cover {
+            transform: rotateX(0deg) rotateZ(0deg) translateY(-50px) scale(1.15);
+            filter: drop-shadow(0 24px 48px rgba(0,0,0,0.3));
+        }
+
+        .level-book.open .book-cover::before {
+            transform: skewY(0deg) scaleX(0);
+        }
+
+        .level-book.open .book-cover::after {
+            transform: skewX(0deg) scaleY(0);
+        }
+
+        .level-book.open .book-cover .front {
+            border-radius: 8px;
+        }
+
+        .level-book.curious .book-cover .front {
+            background: linear-gradient(160deg, #ffa866 0%, #f5873a 40%, #e07020 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 0 rgba(0,0,0,0.1);
+        }
+
+        .level-book.curious .book-cover::before {
+            background: linear-gradient(180deg, #cc6a28 0%, #b85a20 100%);
+        }
+
+        .level-book.curious .book-cover::after {
+            background: linear-gradient(135deg, #b85a20 0%, #a04a18 100%);
+        }
+
+        .level-book.seekers .book-cover .front {
+            background: linear-gradient(160deg, #b388ff 0%, #9c6ade 40%, #7c4fc4 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 0 rgba(0,0,0,0.1);
+        }
+
+        .level-book.seekers .book-cover::before {
+            background: linear-gradient(180deg, #8a5fd4 0%, #7048b0 100%);
+        }
+
+        .level-book.seekers .book-cover::after {
+            background: linear-gradient(135deg, #7048b0 0%, #5a3890 100%);
+        }
+        /* ========== End 3D Book styles ========== */
+
         .button-container {
             display: flex;
             flex-direction: column;
@@ -1211,30 +1378,46 @@
         </div>
         
         <div class="level-container">
-            <div class="level-card" data-level="curious">
-                <div class="level-age">6-12</div>
-                <div class="level-name">
-                    <span class="level-name-en">Young Explorers</span>
-                    <span class="level-name-ar" style="display: none;">المستكشفون الصغار</span>
+            <div class="level-book curious" data-level="curious">
+                <div class="book-cover">
+                    <div class="front">
+                        <div class="book-icon">📖</div>
+                        <div class="book-age">6-12</div>
+                        <div class="book-title-text">
+                            <span class="level-name-en">Young Explorers</span>
+                            <span class="level-name-ar" style="display: none;">المستكشفون الصغار</span>
+                        </div>
+                        <div class="book-story">
+                            <span class="story-title-en">The Sun Sneezes</span>
+                            <span class="story-title-ar" style="display: none;">الشمس تعطس</span>
+                        </div>
+                        <div class="open-hint">
+                            <span class="btn-text-en">▼ Tap to open</span>
+                            <span class="btn-text-ar" style="display: none;">▼ اضغط للفتح</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="story-title">
-                    <span class="story-title-en">The Sun Sneezes</span>
-                    <span class="story-title-ar" style="display: none;">الشمس تعطس</span>
-                </div>
-
             </div>
             
-            <div class="level-card" data-level="seekers">
-                <div class="level-age">13-18</div>
-                <div class="level-name">
-                    <span class="level-name-en">Senior Explorers</span>
-                    <span class="level-name-ar" style="display: none;">المستكشفون الكبار</span>
+            <div class="level-book seekers" data-level="seekers">
+                <div class="book-cover">
+                    <div class="front">
+                        <div class="book-icon">🔭</div>
+                        <div class="book-age">13-18</div>
+                        <div class="book-title-text">
+                            <span class="level-name-en">Senior Explorers</span>
+                            <span class="level-name-ar" style="display: none;">المستكشفون الكبار</span>
+                        </div>
+                        <div class="book-story">
+                            <span class="story-title-en">Celeste's Story</span>
+                            <span class="story-title-ar" style="display: none;">قصة سيليست</span>
+                        </div>
+                        <div class="open-hint">
+                            <span class="btn-text-en">▼ Tap to open</span>
+                            <span class="btn-text-ar" style="display: none;">▼ اضغط للفتح</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="story-title">
-                    <span class="story-title-en">Celeste's Story</span>
-                    <span class="story-title-ar" style="display: none;">قصة سيليست</span>
-                </div>
-
             </div>
         </div>
         
@@ -2245,7 +2428,6 @@
         function showLevelSelection() {
             const levelPage = document.getElementById('levelPage');
             const flipbook = document.getElementById('flipbook');
-            const levelCards = document.querySelectorAll('.level-card');
             const backToHomeBtn = document.getElementById('backToHomeFromLevel');
             
             // Show level selection page
@@ -2257,35 +2439,40 @@
                 levelPage.style.opacity = '1';
             }, 50);
             
-            // Add click handlers for level cards
-            levelCards.forEach(card => {
-                card.addEventListener('click', () => {
-                    const level = card.getAttribute('data-level');
-                    console.log(`Selected level: ${level}`);
-                    console.log(`Current language before flipbook init: ${window.currentLanguage}`);
-                    
-                    // Store selected level for future use
-                    window.selectedLevel = level;
-                    
-                    // Hide level page and show flipbook
-                    levelPage.style.transition = 'opacity 0.5s ease-out';
-                    levelPage.style.opacity = '0';
+            // Add click handlers for 3D books
+            const levelBooks = document.querySelectorAll('.level-book');
+            levelBooks.forEach(book => {
+                book.addEventListener('click', () => {
+                    const level = book.getAttribute('data-level');
+                    if (book.classList.contains('open') || book.classList.contains('opening')) return;
+                    book.classList.add('opening');
+                    book.classList.add('open');
+                    console.log(`📖 ${level} book opened`);
                     
                     setTimeout(() => {
-                        levelPage.style.display = 'none';
-                        flipbook.style.display = 'block';
+                        book.classList.remove('open', 'opening');
+                        window.selectedLevel = level;
                         
-                        // Initialize the flipbook application
-                        window.flipbook = new FlipbookApp();
-                        window.flipbookApp = window.flipbook; // Make it accessible for language switching
+                        // Hide level page and show flipbook
+                        levelPage.style.transition = 'opacity 0.5s ease-out';
+                        levelPage.style.opacity = '0';
                         
-                        // Fade in the flipbook
-                        flipbook.style.opacity = '0';
-                        flipbook.style.transition = 'opacity 0.5s ease-in';
                         setTimeout(() => {
-                            flipbook.style.opacity = '1';
-                        }, 50);
-                    }, 500);
+                            levelPage.style.display = 'none';
+                            flipbook.style.display = 'block';
+                            
+                            // Initialize the flipbook application
+                            window.flipbook = new FlipbookApp();
+                            window.flipbookApp = window.flipbook;
+                            
+                            // Fade in the flipbook
+                            flipbook.style.opacity = '0';
+                            flipbook.style.transition = 'opacity 0.5s ease-in';
+                            setTimeout(() => {
+                                flipbook.style.opacity = '1';
+                            }, 50);
+                        }, 500);
+                    }, 700);
                 });
             });
             
