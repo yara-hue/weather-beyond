@@ -276,7 +276,7 @@
         .level-book {
             position: relative;
             width: 220px;
-            height: 300px;
+            height: 310px;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
             flex-shrink: 0;
@@ -287,7 +287,7 @@
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
-            transform: rotateX(53deg) rotateZ(-37deg);
+            transform: rotateX(55deg) rotateZ(-38deg);
             transition:
                 transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1),
                 translate 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
@@ -295,109 +295,152 @@
             will-change: transform;
         }
 
+        /* ── Front cover ── */
         .level-book .book-cover .front {
             width: 100%;
             height: 100%;
-            border-radius: 6px 8px 8px 6px;
+            border-radius: 4px 8px 8px 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            justify-content: flex-start;
+            gap: 6px;
             position: relative;
             z-index: 2;
-            padding: 20px;
+            padding: 24px 20px 20px;
+            background: #fefcf9;
+            box-shadow:
+                /* page-stack layers at bottom */
+                0 2px 0 #f5f0eb,
+                0 5px 0 #efe8df,
+                0 8px 0 #e9dfd3,
+                0 11px 0 #e2d6c7,
+                /* subtle inset highlight top */
+                inset 0 1px 0 rgba(255,255,255,0.8);
         }
 
+        /* decorative inner frame */
         .level-book .book-cover .front::after {
             content: '';
             position: absolute;
-            top: 15px; left: 15px; right: 15px; bottom: 15px;
-            border: 1.5px solid rgba(255,255,255,0.15);
-            border-radius: 4px;
+            top: 12px; left: 14px; right: 14px; bottom: 14px;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 2px;
             pointer-events: none;
         }
 
         .level-book .book-cover .front .book-icon {
-            font-size: 2.2em;
-            opacity: 0.9;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
-            margin-bottom: 2px;
+            display: none;
         }
 
         .level-book .book-cover .front .book-age {
-            font-size: 0.9em;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 0.7em;
+            color: #c62828;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             font-weight: 600;
-            color: rgba(255,255,255,0.85);
-            letter-spacing: 0.5px;
+            margin-top: 6px;
         }
 
         .level-book .book-cover .front .book-title-text {
-            font-size: 1.2em;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 1.1em;
             font-weight: 700;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            color: #1a1a1a;
             text-align: center;
             line-height: 1.3;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
         }
 
         .level-book .book-cover .front .book-story {
-            font-size: 0.75em;
-            font-style: italic;
-            color: rgba(255,255,255,0.7);
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 0.55em;
+            font-style: normal;
+            color: #666;
             font-weight: 400;
-            letter-spacing: 0.5px;
+            line-height: 1.55;
+            text-align: left;
+            padding: 0 4px;
+            margin-top: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .level-book .book-cover .front .open-hint {
-            font-size: 0.6em;
-            color: rgba(255,255,255,0.5);
-            margin-top: 6px;
-            letter-spacing: 0.5px;
+            font-family: 'Arial', sans-serif;
+            font-size: 0.55em;
+            color: #999;
+            margin-top: auto;
+            margin-bottom: 2px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
+        /* ── Red spine (right face) ── */
         .level-book .book-cover::before {
             content: '';
             position: absolute;
             top: 0;
             left: 100%;
-            width: 28px;
+            width: 24px;
             height: 100%;
+            background: linear-gradient(180deg, #e53935 0%, #c62828 50%, #b71c1c 100%);
             transform-origin: left top;
-            transform: skewY(53deg);
-            border-radius: 0 4px 4px 0;
+            transform: skewY(55deg);
+            border-radius: 0 3px 3px 0;
             z-index: 1;
+            box-shadow: inset -1px 0 2px rgba(0,0,0,0.15);
             transition: transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
         }
 
+        /* subtle page-edge stripes on spine */
+        .level-book .book-cover::before {
+            background: repeating-linear-gradient(
+                90deg,
+                #e53935 0px,
+                #c62828 2px,
+                #b71c1c 4px,
+                #c62828 6px,
+                #e53935 8px
+            );
+        }
+
+        /* ── Red bottom face ── */
         .level-book .book-cover::after {
             content: '';
             position: absolute;
             top: 100%;
             left: 0;
             width: 100%;
-            height: 28px;
+            height: 24px;
+            background: linear-gradient(135deg, #c62828 0%, #b71c1c 50%, #a31515 100%);
             transform-origin: left top;
-            transform: skewX(37deg);
-            border-radius: 0 0 4px 4px;
+            transform: skewX(38deg);
+            border-radius: 0 0 3px 3px;
             z-index: 1;
+            box-shadow: inset 0 -1px 2px rgba(0,0,0,0.2);
             transition: transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
         }
 
+        /* ── Hover / Active / Open ── */
+
         .level-book:hover .book-cover {
-            transform: rotateX(53deg) rotateZ(-37deg) translateY(-6px);
-            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.25));
+            transform: rotateX(55deg) rotateZ(-38deg) translateY(-8px);
+            filter: drop-shadow(0 16px 32px rgba(0,0,0,0.2));
         }
 
         .level-book:active .book-cover {
-            transform: rotateX(53deg) rotateZ(-37deg) translateY(-3px);
-            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+            transform: rotateX(55deg) rotateZ(-38deg) translateY(-3px);
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
         }
 
         .level-book.open .book-cover {
-            transform: rotateX(0deg) rotateZ(0deg) translateY(-50px) scale(1.15);
-            filter: drop-shadow(0 24px 48px rgba(0,0,0,0.3));
+            transform: rotateX(0deg) rotateZ(0deg) translateY(-60px) scale(1.12);
+            filter: drop-shadow(0 28px 56px rgba(0,0,0,0.25));
         }
 
         .level-book.open .book-cover::before {
@@ -409,33 +452,37 @@
         }
 
         .level-book.open .book-cover .front {
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
-        .level-book.curious .book-cover .front {
-            background: linear-gradient(160deg, #ffa866 0%, #f5873a 40%, #e07020 100%);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 0 rgba(0,0,0,0.1);
+        /* ── Color variants ── keep both red for consistency,
+             different decorative inner-border tints */
+
+        .level-book.curious .book-cover .front::after {
+            border-color: rgba(198, 40, 40, 0.08);
         }
 
-        .level-book.curious .book-cover::before {
-            background: linear-gradient(180deg, #cc6a28 0%, #b85a20 100%);
+        .level-book.seekers .book-cover .front::after {
+            border-color: rgba(13, 71, 161, 0.08);
         }
 
-        .level-book.curious .book-cover::after {
-            background: linear-gradient(135deg, #b85a20 0%, #a04a18 100%);
-        }
-
-        .level-book.seekers .book-cover .front {
-            background: linear-gradient(160deg, #b388ff 0%, #9c6ade 40%, #7c4fc4 100%);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 0 rgba(0,0,0,0.1);
+        .level-book.seekers .book-cover .front .book-age {
+            color: #1565c0;
         }
 
         .level-book.seekers .book-cover::before {
-            background: linear-gradient(180deg, #8a5fd4 0%, #7048b0 100%);
+            background: repeating-linear-gradient(
+                90deg,
+                #1e88e5 0px,
+                #1565c0 2px,
+                #0d47a1 4px,
+                #1565c0 6px,
+                #1e88e5 8px
+            );
         }
 
         .level-book.seekers .book-cover::after {
-            background: linear-gradient(135deg, #7048b0 0%, #5a3890 100%);
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 50%, #0a3a8a 100%);
         }
         /* ========== End 3D Book styles ========== */
 
@@ -1381,19 +1428,18 @@
             <div class="level-book curious" data-level="curious">
                 <div class="book-cover">
                     <div class="front">
-                        <div class="book-icon">📖</div>
-                        <div class="book-age">6-12</div>
+                        <div class="book-age">Ages 6-12</div>
                         <div class="book-title-text">
                             <span class="level-name-en">Young Explorers</span>
                             <span class="level-name-ar" style="display: none;">المستكشفون الصغار</span>
                         </div>
                         <div class="book-story">
-                            <span class="story-title-en">The Sun Sneezes</span>
-                            <span class="story-title-ar" style="display: none;">الشمس تعطس</span>
+                            <span class="story-title-en">Discover the amazing story of Sunny the sunflake and his thrilling journey through space. Follow along as solar storms, auroras, and cosmic adventures teach us about the wonders of space weather.</span>
+                            <span class="story-title-ar" style="display: none;">اكتشف القصة المذهلة لسباركي السنبلة الشمسية ورحلته المثيرة عبر الفضاء. تابع العواصف الشمسية والأضواء الشمالية والمغامرات الفضائية التي تعلمنا عن عجائب طقس الفضاء.</span>
                         </div>
                         <div class="open-hint">
-                            <span class="btn-text-en">▼ Tap to open</span>
-                            <span class="btn-text-ar" style="display: none;">▼ اضغط للفتح</span>
+                            <span class="btn-text-en">Tap to open</span>
+                            <span class="btn-text-ar" style="display: none;">اضغط للفتح</span>
                         </div>
                     </div>
                 </div>
@@ -1402,19 +1448,18 @@
             <div class="level-book seekers" data-level="seekers">
                 <div class="book-cover">
                     <div class="front">
-                        <div class="book-icon">🔭</div>
-                        <div class="book-age">13-18</div>
+                        <div class="book-age">Ages 13-18</div>
                         <div class="book-title-text">
                             <span class="level-name-en">Senior Explorers</span>
                             <span class="level-name-ar" style="display: none;">المستكشفون الكبار</span>
                         </div>
                         <div class="book-story">
-                            <span class="story-title-en">Celeste's Story</span>
-                            <span class="story-title-ar" style="display: none;">قصة سيليست</span>
+                            <span class="story-title-en">Join Celeste on an epic voyage through the solar system as she uncovers the mysteries of space weather. From coronal mass ejections to geomagnetic storms, explore how the Sun shapes our cosmic environment.</span>
+                            <span class="story-title-ar" style="display: none;">انضم إلى سيليست في رحلة ملحمية عبر النظام الشمسي وهي تكشف أسرار طقس الفضاء. من الانبعاثات الكتلية الإكليلية إلى العواصف المغناطيسية الأرضية، استكشف كيف تشكل الشمس بيئتنا الكونية.</span>
                         </div>
                         <div class="open-hint">
-                            <span class="btn-text-en">▼ Tap to open</span>
-                            <span class="btn-text-ar" style="display: none;">▼ اضغط للفتح</span>
+                            <span class="btn-text-en">Tap to open</span>
+                            <span class="btn-text-ar" style="display: none;">اضغط للفتح</span>
                         </div>
                     </div>
                 </div>
