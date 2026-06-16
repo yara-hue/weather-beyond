@@ -549,6 +549,33 @@
             display: none;
         }
 
+        .book-intro {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+
+        .book-intro.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .book-intro .book-3d {
+            margin-bottom: 0;
+        }
+
         .book-header {
             background: var(--primary);
             color: var(--text);
@@ -578,6 +605,8 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            opacity: 1;
+            transition: opacity 0.6s ease;
         }
 
         .btn.side-nav {
@@ -1471,27 +1500,12 @@
         </div>
         
         <div class="home-content">
-            <div class="book-3d" id="openBook">
-                <div class="book-cover">
-                    <div class="front">
-                        <div class="book-icon">📖</div>
-                        <div class="book-title-text">
-                            <span class="btn-text-en">Weather Beyond</span>
-                            <span class="btn-text-ar" style="display: none;">الطقس وما بعده</span>
-                        </div>
-                        <div class="book-author">
-                            <span class="btn-text-en">Interactive Flipbook</span>
-                            <span class="btn-text-ar" style="display: none;">كتاب تفاعلي</span>
-                        </div>
-                        <div class="open-hint">
-                            <span class="btn-text-en">▼ Tap to open</span>
-                            <span class="btn-text-ar" style="display: none;">▼ اضغط للفتح</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="button-container">
                 <div class="button-row">
+                    <button class="nav-button read-btn" id="readButton">
+                        <span class="btn-text-en">📖 Read</span>
+                        <span class="btn-text-ar" style="display: none;">📖 اقرأ</span>
+                    </button>
                     <button class="nav-button quiz-btn" id="quizButton">
                         <span class="btn-text-en">Quiz</span>
                         <span class="btn-text-ar" style="display: none;">اختبار</span>
@@ -1518,6 +1532,29 @@
                 <span class="read-aloud-en">Read Aloud</span>
                 <span class="read-aloud-ar" style="display: none;">اقرأ بصوت عالٍ</span>
             </button>
+        </div>
+
+        <!-- 3D Book Intro Overlay (shows when entering Young Explorers) -->
+        <div class="book-intro" id="bookIntro">
+            <div class="book-3d" id="flipbookOpenBook">
+                <div class="book-cover">
+                    <div class="front">
+                        <div class="book-icon">📖</div>
+                        <div class="book-title-text">
+                            <span class="btn-text-en">Weather Beyond</span>
+                            <span class="btn-text-ar" style="display: none;">الطقس وما بعده</span>
+                        </div>
+                        <div class="book-author">
+                            <span class="btn-text-en">Interactive Flipbook</span>
+                            <span class="btn-text-ar" style="display: none;">كتاب تفاعلي</span>
+                        </div>
+                        <div class="open-hint">
+                            <span class="btn-text-en">▼ Tap to open</span>
+                            <span class="btn-text-ar" style="display: none;">▼ اضغط للفتح</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="page-display">
@@ -2332,27 +2369,17 @@
             englishBtn.addEventListener('click', () => switchLanguage('en'));
             arabicBtn.addEventListener('click', () => switchLanguage('ar'));
             
-            // 3D Book click handler - animates open then navigates
-            const openBook = document.getElementById('openBook');
-            if (openBook) {
-                openBook.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (openBook.classList.contains('open') || openBook.classList.contains('opening')) return;
-                    openBook.classList.add('opening');
-                    openBook.classList.add('open');
-                    console.log('📖 Book opened');
-                    
-                    setTimeout(() => {
-                        homePage.style.transition = 'opacity 0.5s ease-out';
-                        homePage.style.opacity = '0';
-                        setTimeout(() => {
-                            homePage.style.display = 'none';
-                            openBook.classList.remove('open', 'opening');
-                            showLevelSelection();
-                        }, 500);
-                    }, 700);
-                });
-            }
+            // Read button - navigates to level selection
+            const readButton = document.getElementById('readButton');
+            readButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                homePage.style.transition = 'opacity 0.5s ease-out';
+                homePage.style.opacity = '0';
+                setTimeout(() => {
+                    homePage.style.display = 'none';
+                    showLevelSelection();
+                }, 500);
+            });
             
             // Quiz button click handler
             quizButton.addEventListener('click', (e) => {
@@ -2472,9 +2499,39 @@
                         levelPage.style.display = 'none';
                         flipbook.style.display = 'block';
                         
+                        // Show 3D book intro for Young Explorers (curious)
+                        const pageDisplay = document.querySelector('.page-display');
+                        const bookIntro = document.getElementById('bookIntro');
+                        const flipbookBook = document.getElementById('flipbookOpenBook');
+                        
+                        if (level === 'curious' && bookIntro && flipbookBook) {
+                            pageDisplay.style.opacity = '0';
+                            pageDisplay.style.pointerEvents = 'none';
+                            bookIntro.classList.add('visible');
+                        }
+                        
                         // Initialize the flipbook application
                         window.flipbook = new FlipbookApp();
                         window.flipbookApp = window.flipbook; // Make it accessible for language switching
+                        
+                        // Set up book click handler for Young Explorers
+                        if (level === 'curious' && bookIntro && flipbookBook) {
+                            flipbookBook.addEventListener('click', function bookClickHandler(e) {
+                                e.preventDefault();
+                                if (flipbookBook.classList.contains('open') || flipbookBook.classList.contains('opening')) return;
+                                flipbookBook.classList.add('opening');
+                                flipbookBook.classList.add('open');
+                                console.log('📖 Flipbook intro book opened');
+                                
+                                setTimeout(() => {
+                                    bookIntro.classList.remove('visible');
+                                    pageDisplay.style.opacity = '1';
+                                    pageDisplay.style.pointerEvents = 'auto';
+                                    flipbookBook.classList.remove('open', 'opening');
+                                    flipbookBook.removeEventListener('click', bookClickHandler);
+                                }, 700);
+                            });
+                        }
                         
                         // Fade in the flipbook
                         flipbook.style.opacity = '0';
