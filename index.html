@@ -564,6 +564,7 @@
             left: 1px;
             border-radius: 5px 0 0 5px;
             z-index: 97;
+            transform: scaleX(-1);
         }
 
         .empty-page .back_cover {
@@ -1184,6 +1185,33 @@
             }
         };
 
+        function loadFlipbookImages(level, lang) {
+            const images = levelPages[level] && levelPages[level][lang];
+            if (!images || images.length === 0) return;
+            
+            const book = document.getElementById('flip_book');
+            
+            const setSrc = (sel, idx) => {
+                const el = book.querySelector(sel);
+                if (el) el.src = images[idx] || images[images.length - 1];
+            };
+            
+            setSrc('.cover_image', 0);
+            setSrc('#page1 .front_content', 1);
+            setSrc('#page1 .back_content', 2);
+            setSrc('#page2 .front_content', 3);
+            setSrc('#page2 .back_content', 4);
+            setSrc('#page3 .front_content', 5);
+            setSrc('#page3 .back_content', 6);
+            setSrc('#page4 .front_content', 7);
+            setSrc('#page4 .back_content', 8);
+            setSrc('#page5 .front_content', 9);
+            setSrc('#page5 .back_content', 10);
+            
+            // Reset flipbook to closed state
+            book.closest('.empty-page').querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+
         // ========================================
         // APPLICATION CODE
         // ========================================
@@ -1268,8 +1296,8 @@
                 }
                 
                 // Refresh empty page if it's currently open
-                if (document.getElementById('emptyPage').style.display !== 'none') {
-                    // Just refresh language display on empty page
+                if (window.selectedLevel && document.getElementById('emptyPage').style.display !== 'none' && document.getElementById('emptyPage').style.display !== '') {
+                    loadFlipbookImages(window.selectedLevel, lang);
                 }
             }
             
@@ -1397,6 +1425,9 @@
                 card.addEventListener('click', () => {
                     const level = card.getAttribute('data-level');
                     window.selectedLevel = level;
+                    
+                    // Load the correct images for this level and language
+                    loadFlipbookImages(level, window.currentLanguage || 'en');
                     
                     // Hide level page and show empty page
                     levelPage.style.transition = 'opacity 0.5s ease-out';
