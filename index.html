@@ -272,144 +272,6 @@
             transform: translateY(-2px) scale(1.1);
         }
 
-        .book-3d {
-            position: relative;
-            width: 220px;
-            height: 300px;
-            margin-bottom: 40px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .book-cover {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            transform: rotateX(53deg) rotateZ(-37deg);
-            transition:
-                transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1),
-                translate 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
-            translate: 0 0 0;
-            will-change: transform;
-        }
-
-        .book-cover .front {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(160deg, #ffa866 0%, #f5873a 40%, #e07020 100%);
-            border-radius: 6px 8px 8px 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            position: relative;
-            z-index: 2;
-            box-shadow:
-                inset 0 1px 0 rgba(255,255,255,0.15),
-                inset 0 -2px 0 rgba(0,0,0,0.1);
-            padding: 20px;
-        }
-
-        .book-cover .front::after {
-            content: '';
-            position: absolute;
-            top: 15px; left: 15px; right: 15px; bottom: 15px;
-            border: 1.5px solid rgba(255,255,255,0.15);
-            border-radius: 4px;
-            pointer-events: none;
-        }
-
-        .book-cover .front .book-title-text {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            text-align: center;
-            line-height: 1.3;
-            letter-spacing: 0.5px;
-        }
-
-        .book-cover .front .book-author {
-            font-size: 0.75em;
-            color: rgba(255,255,255,0.7);
-            font-weight: 400;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .book-cover .front .book-icon {
-            font-size: 2.2em;
-            opacity: 0.9;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
-            margin-bottom: 4px;
-        }
-
-        .book-cover .front .open-hint {
-            font-size: 0.65em;
-            color: rgba(255,255,255,0.5);
-            margin-top: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .book-cover::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 100%;
-            width: 28px;
-            height: 100%;
-            background: linear-gradient(180deg, #cc6a28 0%, #b85a20 100%);
-            transform-origin: left top;
-            transform: skewY(53deg);
-            border-radius: 0 4px 4px 0;
-            z-index: 1;
-            transition: transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
-        }
-
-        .book-cover::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            height: 28px;
-            background: linear-gradient(135deg, #b85a20 0%, #a04a18 100%);
-            transform-origin: left top;
-            transform: skewX(37deg);
-            border-radius: 0 0 4px 4px;
-            z-index: 1;
-            transition: transform 0.7s cubic-bezier(0.15, 0.85, 0.35, 1.1);
-        }
-
-        .book-3d:hover .book-cover {
-            transform: rotateX(53deg) rotateZ(-37deg) translateY(-6px);
-            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.25));
-        }
-
-        .book-3d:active .book-cover {
-            transform: rotateX(53deg) rotateZ(-37deg) translateY(-3px);
-            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
-        }
-
-        .book-3d.open .book-cover {
-            transform: rotateX(0deg) rotateZ(0deg) translateY(-80px) scale(1.15);
-            filter: drop-shadow(0 24px 48px rgba(0,0,0,0.3));
-        }
-
-        .book-3d.open .book-cover::before {
-            transform: skewY(0deg) scaleX(0);
-        }
-
-        .book-3d.open .book-cover::after {
-            transform: skewX(0deg) scaleY(0);
-        }
-
-        .book-3d.open .book-cover .front {
-            border-radius: 8px;
-        }
-
         .button-container {
             display: flex;
             flex-direction: column;
@@ -1471,27 +1333,12 @@
         </div>
         
         <div class="home-content">
-            <div class="book-3d" id="openBook">
-                <div class="book-cover">
-                    <div class="front">
-                        <div class="book-icon">📖</div>
-                        <div class="book-title-text">
-                            <span class="btn-text-en">Weather Beyond</span>
-                            <span class="btn-text-ar" style="display: none;">الطقس وما بعده</span>
-                        </div>
-                        <div class="book-author">
-                            <span class="btn-text-en">Interactive Flipbook</span>
-                            <span class="btn-text-ar" style="display: none;">كتاب تفاعلي</span>
-                        </div>
-                        <div class="open-hint">
-                            <span class="btn-text-en">▼ Tap to open</span>
-                            <span class="btn-text-ar" style="display: none;">▼ اضغط للفتح</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="button-container">
                 <div class="button-row">
+                    <button class="nav-button read-btn" id="readButton">
+                        <span class="btn-text-en">Read</span>
+                        <span class="btn-text-ar" style="display: none;">اقرأ</span>
+                    </button>
                     <button class="nav-button quiz-btn" id="quizButton">
                         <span class="btn-text-en">Quiz</span>
                         <span class="btn-text-ar" style="display: none;">اختبار</span>
@@ -2268,6 +2115,7 @@
         function initializeHomePage() {
             const homePage = document.getElementById('homePage');
             const flipbook = document.getElementById('flipbook');
+            const readButton = document.getElementById('readButton');
             const quizButton = document.getElementById('quizButton');
             const englishBtn = document.getElementById('englishBtn');
             const arabicBtn = document.getElementById('arabicBtn');
@@ -2286,9 +2134,14 @@
             flipbook.style.display = 'none';
             
             console.log('Home page initialized'); // Debug log
+            console.log('Read button:', readButton); // Debug log
             console.log('Quiz button:', quizButton); // Debug log
             
             // Check if buttons exist
+            if (!readButton) {
+                console.error('Read button not found!');
+                return;
+            }
             if (!quizButton) {
                 console.error('Quiz button not found!');
                 return;
@@ -2332,27 +2185,20 @@
             englishBtn.addEventListener('click', () => switchLanguage('en'));
             arabicBtn.addEventListener('click', () => switchLanguage('ar'));
             
-            // 3D Book click handler - animates open then navigates
-            const openBook = document.getElementById('openBook');
-            if (openBook) {
-                openBook.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (openBook.classList.contains('open') || openBook.classList.contains('opening')) return;
-                    openBook.classList.add('opening');
-                    openBook.classList.add('open');
-                    console.log('📖 Book opened');
-                    
-                    setTimeout(() => {
-                        homePage.style.transition = 'opacity 0.5s ease-out';
-                        homePage.style.opacity = '0';
-                        setTimeout(() => {
-                            homePage.style.display = 'none';
-                            openBook.classList.remove('open', 'opening');
-                            showLevelSelection();
-                        }, 500);
-                    }, 700);
-                });
-            }
+            // Read button click handler - now goes to level selection
+            readButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Read button clicked'); // Debug log
+                
+                // Hide home page and show level selection
+                homePage.style.transition = 'opacity 0.5s ease-out';
+                homePage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    homePage.style.display = 'none';
+                    showLevelSelection();
+                }, 500);
+            });
             
             // Quiz button click handler
             quizButton.addEventListener('click', (e) => {
