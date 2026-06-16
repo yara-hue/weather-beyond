@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Flipbook</title>
+    <style>
+        /* 
+         * 3D Flipbook - Single HTML file with CSS variables for easy customization
+         * Change --page-size to adjust book size, --total-pages to change page count
+         * Save as index.html and open in browser to run
+         */
+        
+        :root {
+            --page-size: 400px;
+            --flip-duration: 600ms;
+            --page-color: #f8f9fa;
+            --page-border: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --accent-color: #007bff;
+            --text-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .flipbook-container {
+            perspective: 1000px;
+            margin: 20px 0;
+            transition: transform var(--flip-duration) ease-in-out;
+        }
+
+        .flipbook {
+            position: relative;
+            width: var(--page-size);
+            height: var(--page-size);
+            transform-style: preserve-3d;
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--page-color);
+            border: 2px solid var(--page-border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            backface-visibility: visible;
+            transform-origin: left center;
+            transition: transform var(--flip-duration) ease-in-out;
+        }
+
+        /* Page back styling - separate back content */
+        .page-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #e9ecef;
+            border-radius: 6px;
+            transform: rotateY(180deg);
+            backface-visibility: visible;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 20px;
+        }
+
+        /* Ensure front content is visible when page is in front position */
+        .page > div:not(.page-back) {
+            backface-visibility: visible;
+        }
+
+        /* Special styling for elementary book first page backface */
+        #bookPageElementary .page[data-page="1"] .page-back {
+            background: url('page11.jpeg') center/cover;
+            border-radius: 6px;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 5;
+            backface-visibility: visible;
+        }
+
+        /* Ensure page numbers on back content are visible */
+        .page-back .page-number {
+            backface-visibility: visible;
+        }
+
+        /* Click regions for navigation - positioned over specific page faces */
+        .click-region {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .click-region.front {
+            /* Front face region - goes forward */
+            background: rgba(0, 255, 0, 0.3); /* Green tint for debugging */
+        }
+
+        .click-region.back {
+            /* Back face region - goes backward */
+            background: rgba(255, 0, 0, 0.3); /* Red tint for debugging */
+        }
+
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            :root {
+                --page-size: 250px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            .page {
+                font-size: 16px;
+                padding: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --page-size: 200px;
+            }
+            
+            .page {
+                font-size: 14px;
+                padding: 12px;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .page {
+                transition: transform 0.1s ease-in-out;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        .btn:focus {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .click-region:focus {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -2px;
+        }
+
+        /* Landing Page Styles */
+        .landing-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .read-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .read-button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .read-button:active {
+            transform: translateY(0);
+        }
+
+        /* Book Page Styles */
+        .book-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landingPage" class="landing-page">
+        <h1 style="color: white; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Weather Beyond</h1>
+        <p style="color: white; font-size: 18px; margin-bottom: 30px; text-align: center; max-width: 600px;">Explore weather and climate through a beautiful interactive 3D flipbook. Start by selecting your age group to get a tailored experience.</p>
+        <button id="readButton" class="read-button">Start Reading</button>
+    </div>
+
+    <!-- Age Selection Page -->
+    <div id="agePage" class="landing-page" style="display: none; gap: 16px;">
+        <h2 style="color: white; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Choose your age group</h2>
+        <div style="display:flex; gap:16px; flex-wrap: wrap; justify-content: center;">
+            <button id="btnElementary" class="read-button" aria-label="Elementary school ages 6-10">Elementary school → ages 6–10</button>
+            <button id="btnMiddle" class="read-button" aria-label="Middle school ages 11-14">Middle school → ages 11–14</button>
+            <button id="btnHigh" class="read-button" aria-label="High school ages 14-18">High school → ages 14–18</button>
+        </div>
+        <button id="ageBackBtn" class="back-button" style="margin-top: 20px;">← Back to Home</button>
+    </div>
+
+    <!-- Book Page - Elementary -->
+    <div id="bookPageElementary" class="book-page" style="display: none;">
+        <h1 style="color: white; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Weather Beyond — Elementary (6–10)</h1>
+        <button data-back="age" class="back-button">← Back</button>
+        <div class="flipbook-root">
+            <div class="flipbook-container">
+                <div class="flipbook">
+                    <div class="click-region front" tabindex="0" aria-label="Go to next page (front face)"></div>
+                    <div class="click-region back" tabindex="0" aria-label="Go to previous page (back face)"></div>
+                    <div class="page" data-page="1">
+                        <div>Weather Beyond</div>
+                        <div style="margin-top:10px;color:#666">Elementary Edition</div>
+                        <div class="page-number"></div>
+                        <div class="page-back">
+                            <div>Welcome!</div>
+                            <div style="margin-top:10px;color:#666">Let's explore weather together</div>
+                        </div>
+                    </div>
+                    <div class="page" data-page="2">
+                        <div>Sunny Skies</div>
+                        <div style="margin-top:10px;color:#666">What makes a sunny day?</div>
+                        <div class="page-number">1</div>
+                        <div class="page-back">
+                            <div>Sun Facts</div>
+                            <div style="margin-top:10px;color:#666">The sun gives us light and warmth</div>
+                            <div class="page-number">2</div>
+                        </div>
+                    </div>
+                    <div class="page" data-page="3">
+                        <div>Clouds</div>
+                        <div style="margin-top:10px;color:#666">Meet fluffy cumulus!</div>
+                        <div class="page-number">3</div>
+                        <div class="page-back">
+                            <div>Cloud Types</div>
+                            <div style="margin-top:10px;color:#666">Cumulus, stratus, and cirrus</div>
+                            <div class="page-number">4</div>
+                        </div>
+                    </div>
+                    <div class="page" data-page="4">
+                        <div>Rain</div>
+                        <div style="margin-top:10px;color:#666">How does rain form?</div>
+                        <div class="page-number">5</div>
+                        <div class="page-back">
+                            <div>Water Cycle</div>
+                            <div style="margin-top:10px;color:#666">Rain comes from clouds</div>
+                            <div class="page-number">6</div>
+                        </div>
+                    </div>
+                    <div class="page" data-page="5">
+                        <div>Wind</div>
+                        <div style="margin-top:10px;color:#666">Air on the move</div>
+                        <div class="page-number">7</div>
+                        <div class="page-back">
+                            <div>Wind Power</div>
+                            <div style="margin-top:10px;color:#666">Wind moves things around</div>
+                            <div class="page-number">8</div>
+                        </div>
+                    </div>
+                    <div class="page" data-page="6">
+                        <div>Storms</div>
+                        <div style="margin-top:10px;color:#666">Thunder and lightning</div>
+                        <div class="page-number">9</div>
+                        <div class="page-back">
+                            <div>Storm Safety</div>
+                            <div style="margin-top:10px;color:#666">Stay inside during storms</div>
+                            <div class="page-number">10</div>
+                        </div>
+                    </div>
+                    <div class="page" data-page="7">
+                        <div>Snow</div>
+                        <div style="margin-top:10px;color:#666">Snowflakes are unique</div>
+                        <div class="page-number">11</div>
+                        <div class="page-back">
+                            <div>Winter Fun</div>
+                            <div style="margin-top:10px;color:#666">Each snowflake is different</div>
+                            <div class="page-number">12</div>
+                        </div>
+                    </div>
+                    <div class="page" data-page="8">
+                        <div>Rainbows</div>
+                        <div style="margin-top:10px;color:#666">Light and colors</div>
+                        <div class="page-number">13</div>
+                        <div class="page-back">
+                            <div>Great Job!</div>
+                            <div style="margin-top:10px;color:#666">You explored the weather!</div>
+                            <div class="page-number">14</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Page - Middle -->
+    <div id="bookPageMiddle" class="book-page" style="display: none;">
+        <h1 style="color: white; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Weather Beyond — Middle (11–14)</h1>
+        <button data-back="age" class="back-button">← Back</button>
+        <div class="flipbook-root">
+            <div class="flipbook-container">
+                <div class="flipbook">
+                    <div class="click-region front" tabindex="0" aria-label="Go to next page (front face)"></div>
+                    <div class="click-region back" tabindex="0" aria-label="Go to previous page (back face)"></div>
+                    <div class="page" data-page="1"><div>Atmosphere Layers</div><div style="margin-top:10px;color:#666">Troposphere to exosphere</div><div class="page-number">1</div></div>
+                    <div class="page" data-page="2"><div>Water Cycle</div><div style="margin-top:10px;color:#666">Evaporation & condensation</div><div class="page-number">2</div></div>
+                    <div class="page" data-page="3"><div>Air Pressure</div><div style="margin-top:10px;color:#666">High vs low systems</div><div class="page-number">3</div></div>
+                    <div class="page" data-page="4"><div>Fronts</div><div style="margin-top:10px;color:#666">Cold, warm, stationary</div><div class="page-number">4</div></div>
+                    <div class="page" data-page="5"><div>Severe Weather</div><div style="margin-top:10px;color:#666">Tornadoes & hurricanes</div><div class="page-number">5</div></div>
+                    <div class="page" data-page="6"><div>Forecasting</div><div style="margin-top:10px;color:#666">Reading a map</div><div class="page-number">6</div></div>
+                    <div class="page" data-page="7"><div>Climate Zones</div><div style="margin-top:10px;color:#666">Köppen overview</div><div class="page-number">7</div></div>
+                    <div class="page" data-page="8"><div>Recap</div><div style="margin-top:10px;color:#666">What did we learn?</div><div class="page-number">8</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Page - High -->
+    <div id="bookPageHigh" class="book-page" style="display: none;">
+        <h1 style="color: white; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Weather Beyond — High (14–18)</h1>
+        <button data-back="age" class="back-button">← Back</button>
+        <div class="flipbook-root">
+            <div class="flipbook-container">
+                <div class="flipbook">
+                    <div class="click-region front" tabindex="0" aria-label="Go to next page (front face)"></div>
+                    <div class="click-region back" tabindex="0" aria-label="Go to previous page (back face)"></div>
+                    <div class="page" data-page="1"><div>Radiative Balance</div><div style="margin-top:10px;color:#666">Energy in, energy out</div><div class="page-number">1</div></div>
+                    <div class="page" data-page="2"><div>Dynamics</div><div style="margin-top:10px;color:#666">Coriolis & jet streams</div><div class="page-number">2</div></div>
+                    <div class="page" data-page="3"><div>Thermodynamics</div><div style="margin-top:10px;color:#666">Lapse rates & CAPE</div><div class="page-number">3</div></div>
+                    <div class="page" data-page="4"><div>Synoptics</div><div style="margin-top:10px;color:#666">Mid-latitude cyclones</div><div class="page-number">4</div></div>
+                    <div class="page" data-page="5"><div>Mesoscale</div><div style="margin-top:10px;color:#666">Storm structure</div><div class="page-number">5</div></div>
+                    <div class="page" data-page="6"><div>Modeling</div><div style="margin-top:10px;color:#666">NWP basics</div><div class="page-number">6</div></div>
+                    <div class="page" data-page="7"><div>Climate Change</div><div style="margin-top:10px;color:#666">Forcing & feedbacks</div><div class="page-number">7</div></div>
+                    <div class="page" data-page="8"><div>Outlook</div><div style="margin-top:10px;color:#666">Careers in met</div><div class="page-number">8</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /*
+         * 3D Flipbook JavaScript - Handles page flipping, navigation, and state management
+         * Uses CSS transforms for smooth 3D page turning animations
+         */
+        
+        // Navigation between landing, age selection and per-age books
+        function showLandingPage() {
+            document.getElementById('landingPage').style.display = 'flex';
+            document.getElementById('agePage').style.display = 'none';
+            document.getElementById('bookPageElementary').style.display = 'none';
+            document.getElementById('bookPageMiddle').style.display = 'none';
+            document.getElementById('bookPageHigh').style.display = 'none';
+        }
+
+        function showAgePage() {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('agePage').style.display = 'flex';
+            document.getElementById('bookPageElementary').style.display = 'none';
+            document.getElementById('bookPageMiddle').style.display = 'none';
+            document.getElementById('bookPageHigh').style.display = 'none';
+        }
+
+        function showBookFor(group) {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('agePage').style.display = 'none';
+            const sections = {
+                elementary: document.getElementById('bookPageElementary'),
+                middle: document.getElementById('bookPageMiddle'),
+                high: document.getElementById('bookPageHigh')
+            };
+            Object.values(sections).forEach(s => s.style.display = 'none');
+            const target = sections[group];
+            if (target) target.style.display = 'flex';
+            // Initialize a flipbook for the target section if not already
+            if (!target.__flipbook) {
+                target.__flipbook = new Flipbook(target);
+            }
+        }
+
+        // Event listeners for navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('readButton').addEventListener('click', showAgePage);
+            document.getElementById('ageBackBtn').addEventListener('click', showLandingPage);
+            document.getElementById('btnElementary').addEventListener('click', () => showBookFor('elementary'));
+            document.getElementById('btnMiddle').addEventListener('click', () => showBookFor('middle'));
+            document.getElementById('btnHigh').addEventListener('click', () => showBookFor('high'));
+            // Back buttons on book pages
+            Array.from(document.querySelectorAll('[data-back="age"]')).forEach(btn =>
+                btn.addEventListener('click', showAgePage)
+            );
+        });
+        
+        class Flipbook {
+            // rootEl should be the per-book page container (e.g., #bookPageElementary)
+            constructor(rootEl) {
+                this.currentPage = 1;
+                this.totalPages = 8;
+                this.isAnimating = false;
+                
+                // Get DOM elements
+                this.root = rootEl;
+                this.flipbook = this.root.querySelector('.flipbook');
+                this.pages = this.root.querySelectorAll('.page');
+                this.frontRegion = this.root.querySelector('.front');
+                this.backRegion = this.root.querySelector('.back');
+                
+                this.init();
+            }
+            
+            init() {
+                // Set initial page positions - only first page visible
+                this.updatePagePositions();
+                this.updateControls();
+                
+                
+                // Event listeners for click regions - front face goes forward, back face goes backward
+                this.frontRegion.addEventListener('click', (e) => {
+                    console.log('Front region clicked - going forward');
+                    this.nextPage();
+                });
+                this.backRegion.addEventListener('click', (e) => {
+                    console.log('Back region clicked - going backward');
+                    this.previousPage();
+                });
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        this.previousPage();
+                    } else if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        this.nextPage();
+                    }
+                });
+                
+                // Accessibility - make click regions focusable
+                this.backRegion.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.previousPage();
+                    }
+                });
+                
+                this.frontRegion.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.nextPage();
+                    }
+                });
+            }
+            
+            updatePagePositions() {
+                // Position pages in 3D space - current page at front, others stacked behind
+                this.pages.forEach((page, index) => {
+                    const pageNum = index + 1;
+                    
+                    if (pageNum < this.currentPage) {
+                        // Pages before current - flipped to the left and stacked
+                        const stackOffset = (this.currentPage - pageNum) * 2; // Small offset for stacking
+                        page.style.transform = `rotateY(-180deg) translateX(-${stackOffset}px)`;
+                        page.style.zIndex = this.currentPage - pageNum;
+                    } else if (pageNum === this.currentPage) {
+                        // Current page - front and center
+                        page.style.transform = 'rotateY(0deg)';
+                        page.style.zIndex = this.totalPages + 1;
+                    } else {
+                        // Pages after current - stacked to the right, ready to flip from left
+                        const stackOffset = (pageNum - this.currentPage) * 2; // Small offset for stacking
+                        page.style.transform = `rotateY(0deg) translateX(${stackOffset}px)`;
+                        page.style.zIndex = this.totalPages - (pageNum - this.currentPage);
+                    }
+                });
+                
+                // Position click regions based on visible page faces
+                this.updateClickRegions();
+                
+                // Center the book when on first page
+                this.centerBook();
+            }
+            
+            updateClickRegions() {
+                if (this.currentPage === 1) {
+                    // Only front face visible - only front region active, cover full width
+                    this.frontRegion.style.display = 'block';
+                    this.frontRegion.style.width = '100%';
+                    this.frontRegion.style.left = '0';
+                    this.frontRegion.style.right = 'auto';
+                    this.frontRegion.style.height = '100%';
+                    this.frontRegion.style.top = '0';
+                    this.backRegion.style.display = 'none';
+                } else {
+                    // Book is opened - position regions to completely fill each page with full width coverage
+                    // Back region covers the entire left page (back face) with full width
+                    this.backRegion.style.display = 'block';
+                    this.backRegion.style.width = '100%';
+                    this.backRegion.style.left = '-100%'; // Position to completely cover the left page
+                    this.backRegion.style.right = 'auto';
+                    this.backRegion.style.height = '100%';
+                    this.backRegion.style.top = '0';
+                    // Front region covers the entire right page (current page) with full width
+                    this.frontRegion.style.display = 'block';
+                    this.frontRegion.style.width = '100%';
+                    this.frontRegion.style.left = '0';
+                    this.frontRegion.style.right = 'auto';
+                    this.frontRegion.style.height = '100%';
+                    this.frontRegion.style.top = '0';
+                }
+            }
+            
+            centerBook() {
+                // Center the book based on whether it's opened or closed
+                const container = this.flipbook.parentElement;
+                
+                if (this.currentPage === 1) {
+                    // Book is closed - center it normally
+                    container.style.transform = 'translateX(0px)';
+                } else {
+                    // Book is opened - move right to center both front and back faces
+                    container.style.transform = 'translateX(200px)';
+                }
+            }
+            
+            nextPage() {
+                if (this.currentPage < this.totalPages && !this.isAnimating) {
+                    this.isAnimating = true;
+                    this.currentPage++;
+                    this.updatePagePositions();
+                    this.updateControls();
+                    
+                    // Reset animation flag after transition completes
+                    setTimeout(() => {
+                        this.isAnimating = false;
+                    }, 600);
+                }
+            }
+            
+            previousPage() {
+                if (this.currentPage > 1 && !this.isAnimating) {
+                    this.isAnimating = true;
+                    this.currentPage--;
+                    this.updatePagePositions();
+                    this.updateControls();
+                    
+                    // Reset animation flag after transition completes
+                    setTimeout(() => {
+                        this.isAnimating = false;
+                    }, 600);
+                }
+            }
+            
+            updateControls() {
+                // Update click region states for visual feedback
+                this.backRegion.style.opacity = this.currentPage === 1 ? '0.3' : '1';
+                this.frontRegion.style.opacity = this.currentPage === this.totalPages ? '0.3' : '1';
+            }
+        }
+        
+        // Initialize: show landing by default
+        document.addEventListener('DOMContentLoaded', () => {
+            showLandingPage();
+        });
+    </script>
+</body>
+</html>
