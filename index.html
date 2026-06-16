@@ -70,7 +70,31 @@
             box-shadow: 0 4px 8px var(--shadow-color);
             backface-visibility: visible;
             transform-origin: left center;
-            transition: transform var(--flip-duration) ease-in-out;
+            transition: transform var(--flip-duration) cubic-bezier(0.4, 0.0, 0.2, 1);
+            will-change: transform;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+        }
+
+        .page::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to left, rgba(0,0,0,0.06) 0%, transparent 40%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            border-radius: 6px;
+        }
+
+        .page.flipping::after {
+            opacity: 1;
+        }
+
+        .page.flipping {
+            box-shadow:
+                -4px 0 12px rgba(0,0,0,0.12),
+                0 8px 24px rgba(0,0,0,0.08),
+                4px 4px 8px var(--shadow-color);
         }
 
         /* Page back styling - separate back content */
@@ -468,97 +492,124 @@
         });
         
         class Flipbook {
-            // rootEl should be the per-book page container (e.g., #bookPageElementary)
             constructor(rootEl) {
                 this.currentPage = 1;
                 this.totalPages = 8;
                 this.isAnimating = false;
-                
-                // Get DOM elements
+                this.flipDuration = 600;
+
                 this.root = rootEl;
                 this.flipbook = this.root.querySelector('.flipbook');
                 this.pages = this.root.querySelectorAll('.page');
                 this.frontRegion = this.root.querySelector('.front');
                 this.backRegion = this.root.querySelector('.back');
-                
+
                 this.init();
             }
-            
+
             init() {
-                // Set initial page positions - only first page visible
                 this.updatePagePositions();
                 this.updateControls();
-                
-                
-                // Event listeners for click regions - front face goes forward, back face goes backward
-                this.frontRegion.addEventListener('click', (e) => {
-                    console.log('Front region clicked - going forward');
-                    this.nextPage();
-                });
-                this.backRegion.addEventListener('click', (e) => {
-                    console.log('Back region clicked - going backward');
-                    this.previousPage();
-                });
-                
-                // Keyboard navigation
+
+                this.frontRegion.addEventListener('click', () => this.nextPage());
+                this.backRegion.addEventListener('click', () => this.previousPage());
+
                 document.addEventListener('keydown', (e) => {
-                    if (e.key === 'ArrowLeft') {
-                        e.preventDefault();
-                        this.previousPage();
-                    } else if (e.key === 'ArrowRight') {
-                        e.preventDefault();
-                        this.nextPage();
-                    }
+                    if (e.key === 'ArrowLeft') { e.preventDefault(); this.previousPage(); }
+                    else if (e.key === 'ArrowRight') { e.preventDefault(); this.nextPage(); }
                 });
-                
-                // Accessibility - make click regions focusable
+
                 this.backRegion.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.previousPage();
-                    }
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.previousPage(); }
                 });
-                
                 this.frontRegion.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.nextPage();
-                    }
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.nextPage(); }
                 });
             }
-            
+
+            nextPage() {
+                if (this.currentPage >= this.totalPages || this.isAnimating) return;
+                this.isAnimating = true;
+
+                const page = this.pages[this.currentPage - 1];
+                page.classList.add('flipping');
+
+                page.style.zIndex = this.totalPages + 2;
+                page.style.transition = 'none';
+                page.style.transform = 'rotateY(0deg)';
+
+                void page.offsetHeight;
+
+                page.style.transition = `transform ${this.flipDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1)`;
+                page.style.transform = 'rotateY(-180deg)';
+
+                this.currentPage++;
+
+                setTimeout(() => {
+                    page.classList.remove('flipping');
+                    this.updatePagePositions();
+                    this.updateControls();
+                    this.isAnimating = false;
+                }, this.flipDuration);
+            }
+
+            previousPage() {
+                if (this.currentPage <= 1 || this.isAnimating) return;
+                this.isAnimating = true;
+
+                const page = this.pages[this.currentPage - 2];
+                page.classList.add('flipping');
+
+                page.style.zIndex = this.totalPages + 2;
+                page.style.transition = 'none';
+                page.style.transform = 'rotateY(-180deg)';
+
+                void page.offsetHeight;
+
+                page.style.transition = `transform ${this.flipDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1)`;
+                page.style.transform = 'rotateY(0deg)';
+
+                this.currentPage--;
+
+                setTimeout(() => {
+                    page.classList.remove('flipping');
+                    this.updatePagePositions();
+                    this.updateControls();
+                    this.isAnimating = false;
+                }, this.flipDuration);
+            }
+
             updatePagePositions() {
-                // Position pages in 3D space - current page at front, others stacked behind
                 this.pages.forEach((page, index) => {
                     const pageNum = index + 1;
-                    
+                    page.style.transition = 'none';
+
                     if (pageNum < this.currentPage) {
-                        // Pages before current - flipped to the left and stacked
-                        const stackOffset = (this.currentPage - pageNum) * 2; // Small offset for stacking
+                        const stackOffset = (this.currentPage - pageNum) * 2;
                         page.style.transform = `rotateY(-180deg) translateX(-${stackOffset}px)`;
-                        page.style.zIndex = this.currentPage - pageNum;
+                        page.style.zIndex = pageNum;
                     } else if (pageNum === this.currentPage) {
-                        // Current page - front and center
                         page.style.transform = 'rotateY(0deg)';
                         page.style.zIndex = this.totalPages + 1;
                     } else {
-                        // Pages after current - stacked to the right, ready to flip from left
-                        const stackOffset = (pageNum - this.currentPage) * 2; // Small offset for stacking
+                        const stackOffset = (pageNum - this.currentPage) * 2;
                         page.style.transform = `rotateY(0deg) translateX(${stackOffset}px)`;
                         page.style.zIndex = this.totalPages - (pageNum - this.currentPage);
                     }
                 });
-                
-                // Position click regions based on visible page faces
+
                 this.updateClickRegions();
-                
-                // Center the book when on first page
                 this.centerBook();
+
+                requestAnimationFrame(() => {
+                    this.pages.forEach(page => {
+                        page.style.transition = `transform ${this.flipDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1)`;
+                    });
+                });
             }
-            
+
             updateClickRegions() {
                 if (this.currentPage === 1) {
-                    // Only front face visible - only front region active, cover full width
                     this.frontRegion.style.display = 'block';
                     this.frontRegion.style.width = '100%';
                     this.frontRegion.style.left = '0';
@@ -567,15 +618,12 @@
                     this.frontRegion.style.top = '0';
                     this.backRegion.style.display = 'none';
                 } else {
-                    // Book is opened - position regions to completely fill each page with full width coverage
-                    // Back region covers the entire left page (back face) with full width
                     this.backRegion.style.display = 'block';
                     this.backRegion.style.width = '100%';
-                    this.backRegion.style.left = '-100%'; // Position to completely cover the left page
+                    this.backRegion.style.left = '-100%';
                     this.backRegion.style.right = 'auto';
                     this.backRegion.style.height = '100%';
                     this.backRegion.style.top = '0';
-                    // Front region covers the entire right page (current page) with full width
                     this.frontRegion.style.display = 'block';
                     this.frontRegion.style.width = '100%';
                     this.frontRegion.style.left = '0';
@@ -584,50 +632,17 @@
                     this.frontRegion.style.top = '0';
                 }
             }
-            
+
             centerBook() {
-                // Center the book based on whether it's opened or closed
                 const container = this.flipbook.parentElement;
-                
                 if (this.currentPage === 1) {
-                    // Book is closed - center it normally
                     container.style.transform = 'translateX(0px)';
                 } else {
-                    // Book is opened - move right to center both front and back faces
                     container.style.transform = 'translateX(200px)';
                 }
             }
-            
-            nextPage() {
-                if (this.currentPage < this.totalPages && !this.isAnimating) {
-                    this.isAnimating = true;
-                    this.currentPage++;
-                    this.updatePagePositions();
-                    this.updateControls();
-                    
-                    // Reset animation flag after transition completes
-                    setTimeout(() => {
-                        this.isAnimating = false;
-                    }, 600);
-                }
-            }
-            
-            previousPage() {
-                if (this.currentPage > 1 && !this.isAnimating) {
-                    this.isAnimating = true;
-                    this.currentPage--;
-                    this.updatePagePositions();
-                    this.updateControls();
-                    
-                    // Reset animation flag after transition completes
-                    setTimeout(() => {
-                        this.isAnimating = false;
-                    }, 600);
-                }
-            }
-            
+
             updateControls() {
-                // Update click region states for visual feedback
                 this.backRegion.style.opacity = this.currentPage === 1 ? '0.3' : '1';
                 this.frontRegion.style.opacity = this.currentPage === this.totalPages ? '0.3' : '1';
             }
