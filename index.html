@@ -423,6 +423,28 @@
             overflow: visible;
         }
 
+        .book-cover {
+            position: absolute;
+            inset: 0;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            background-color: var(--page-bg);
+        }
+        .book-cover.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .book-cover.hiding {
+            opacity: 0;
+            pointer-events: none;
+        }
+
         /* Back + audio buttons overlay */
         .cover .back-btn {
             position: absolute;
@@ -1117,6 +1139,8 @@
             </div>
         </div>
 
+        <div class="book-cover" id="bookCover"></div>
+
         <!-- Navigation buttons -->
         <button class="nav-corner nav-left" id="prevBtn">‹</button>
         <button class="nav-corner nav-right" id="nextBtn">›</button>
@@ -1318,6 +1342,7 @@
                 this.rightPage = document.getElementById('pageRight');
                 this.pageFront = document.querySelector('.book__page-front');
                 this.pageBack = document.querySelector('.book__page-back');
+                this.bookCover = document.getElementById('bookCover');
                 this.leftNum = document.getElementById('leftNum');
                 this.rightNum = document.getElementById('rightNum');
                 this.frontNum = document.getElementById('frontNum');
@@ -1348,6 +1373,10 @@
                     leftIdx = 0;
                     rightIdx = 0;
                     backIdx = 1;
+
+                    this.setPageImage(this.bookCover, 0);
+                    this.bookCover.classList.remove('hiding');
+                    this.bookCover.classList.add('visible');
                 } else {
                     leftIdx = spreadIndex * 2 + 1;
                     rightIdx = leftIdx + 1;
@@ -1365,6 +1394,10 @@
 
                 this.setPageImage(this.rightPage, rightIdx);
                 this.rightNum.textContent = (spreadIndex === -1 || rightIdx >= this.totalPages) ? '' : rightIdx + 1;
+
+                if (spreadIndex !== -1) {
+                    this.bookCover.classList.remove('visible', 'hiding');
+                }
 
                 // Reset overlay to unflipped
                 this.pageFlip.style.transition = 'none';
@@ -1385,6 +1418,7 @@
 
                 this.pageLeft.addEventListener('click', () => this.previousPage());
                 this.pageRight.addEventListener('click', () => this.nextPage());
+                this.bookCover.addEventListener('click', () => this.nextPage());
 
                 if (settings.enableKeyboardNav) {
                     document.addEventListener('keydown', (e) => {
@@ -1426,32 +1460,37 @@
                 if (this.currentSpread === -1) {
                     this.isAnimating = true;
 
+                    this.bookCover.classList.remove('visible');
+                    this.bookCover.classList.add('hiding');
+
                     this.setPageImage(this.pageBack, 1);
                     this.backNum.textContent = '1';
 
                     this.setPageImage(this.rightPage, 2);
                     this.rightNum.textContent = '2';
 
-                    this.flipToggle.checked = true;
+                    setTimeout(() => {
+                        this.flipToggle.checked = true;
 
-                    const onFlipEnd = () => {
-                        this.pageFlip.removeEventListener('transitionend', onFlipEnd);
+                        const onFlipEnd = () => {
+                            this.pageFlip.removeEventListener('transitionend', onFlipEnd);
 
-                        this.setPageImage(this.leftPage, 1);
-                        this.leftNum.textContent = '1';
-                        this.setPageImage(this.pageFront, 2);
-                        this.frontNum.textContent = '2';
+                            this.setPageImage(this.leftPage, 1);
+                            this.leftNum.textContent = '1';
+                            this.setPageImage(this.pageFront, 2);
+                            this.frontNum.textContent = '2';
 
-                        this.pageFlip.style.transition = 'none';
-                        this.flipToggle.checked = false;
-                        void this.pageFlip.offsetHeight;
-                        this.pageFlip.style.transition = '';
+                            this.pageFlip.style.transition = 'none';
+                            this.flipToggle.checked = false;
+                            void this.pageFlip.offsetHeight;
+                            this.pageFlip.style.transition = '';
 
-                        this.currentSpread = 0;
-                        this.updateDisplay();
-                        this.isAnimating = false;
-                    };
-                    this.pageFlip.addEventListener('transitionend', onFlipEnd, { once: true });
+                            this.currentSpread = 0;
+                            this.updateDisplay();
+                            this.isAnimating = false;
+                        };
+                        this.pageFlip.addEventListener('transitionend', onFlipEnd, { once: true });
+                    }, 500);
                     return;
                 }
 
@@ -1504,6 +1543,9 @@
                     this.backNum.textContent = '';
                     this.setPageImage(this.rightPage, 0);
                     this.rightNum.textContent = '';
+
+                    this.bookCover.classList.remove('hiding');
+                    this.bookCover.classList.add('visible');
 
                     this.pageFlip.style.transition = 'none';
                     this.flipToggle.checked = false;
