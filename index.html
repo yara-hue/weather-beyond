@@ -417,6 +417,8 @@
             max-width: 94vw;
             display: none;
             overflow: visible;
+            justify-content: center;
+            align-items: center;
         }
 
         .empty-page .back-btn {
@@ -436,6 +438,174 @@
             opacity: 0.6;
         }
         .empty-page .back-btn:hover { opacity: 1; }
+
+        /* ========== FLIP BOOK ========== */
+
+        .empty-page input[type="checkbox"] { display: none; }
+
+        .empty-page #flip_book {
+            width: 370px;
+            height: 380px;
+            position: relative;
+            transition-duration: 1s;
+            perspective: 2000px;
+        }
+
+        .empty-page .front_cover,
+        .empty-page .back_cover {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 2.5px 5px 5px 2.5px;
+            background-image: url(https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/flip_book_edge_shading.webp);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgb(220, 20, 60);
+            box-shadow: 0 0 5px 0 rgba(25, 25, 25, 0.25);
+        }
+
+        .empty-page .front_cover {
+            position: absolute;
+            cursor: pointer;
+            transform-origin: center left;
+            transition: transform 0.5s;
+            z-index: 99;
+        }
+
+        .empty-page .front_cover label {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        .empty-page .page {
+            width: 360px;
+            height: 360px;
+            position: absolute;
+            top: 10px;
+            left: 1px;
+            border-radius: 0 5px 5px 0;
+            background-color: white;
+            transform-origin: left;
+            transform-style: preserve-3d;
+            transform: rotateY(0deg);
+            transition-duration: 0.5s;
+        }
+
+        .empty-page .front_page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+        }
+
+        .empty-page .front_page label {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .empty-page .back_page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+            z-index: 100;
+        }
+
+        .empty-page .back_page label {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .empty-page .edge_shading {
+            width: 360px;
+            height: 360px;
+            position: absolute;
+            z-index: 98;
+        }
+
+        .empty-page .front_content {
+            width: 359px;
+            height: 358px;
+            position: absolute;
+            top: 1px;
+            border-radius: 0 5px 5px 0;
+            z-index: 97;
+        }
+
+        .empty-page .back_content {
+            width: 359px;
+            height: 358px;
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            border-radius: 5px 0 0 5px;
+            z-index: 97;
+        }
+
+        .empty-page .back_cover {
+            position: relative;
+            z-index: -1;
+        }
+
+        .empty-page #page1 { z-index: 8; }
+        .empty-page #page2 { z-index: 5; }
+        .empty-page #page3 { z-index: 4; }
+        .empty-page #page4 { z-index: 3; }
+        .empty-page #page5 { z-index: 2; }
+
+        .empty-page #cover_checkbox:checked ~ #flip_book {
+            transform: translateX(180px);
+        }
+
+        .empty-page #cover_checkbox:checked ~ #flip_book .front_cover {
+            transform: rotateY(-180deg);
+            transition: transform 1.5s, z-index 0.5s 0.5s;
+            z-index: 1;
+        }
+
+        .empty-page #cover_checkbox:checked ~ #flip_book #cover {
+            width: 80%;
+            height: 80%;
+            position: absolute;
+        }
+
+        .empty-page #page1_checkbox:checked ~ #flip_book #page1 {
+            transform: rotateY(-180deg);
+            z-index: 3;
+        }
+
+        .empty-page #page2_checkbox:checked ~ #flip_book #page2 {
+            transform: rotateY(-180deg);
+            z-index: 4;
+        }
+
+        .empty-page #page3_checkbox:checked ~ #flip_book #page3 {
+            transform: rotateY(-180deg);
+            z-index: 5;
+        }
+
+        .empty-page #page4_checkbox:checked ~ #flip_book #page4 {
+            transform: rotateY(-180deg);
+            z-index: 6;
+        }
+
+        .empty-page #page5_checkbox:checked ~ #flip_book #page5 {
+            transform: rotateY(-180deg);
+            z-index: 9;
+        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -501,6 +671,12 @@
                 top: calc(var(--baseline) * -3);
                 font-size: calc(var(--baseline) * 1);
             }
+            .empty-page #flip_book {
+                transform: scale(0.85);
+                transform-origin: center center;
+            }
+            .empty-page #cover_checkbox:checked ~ #flip_book {
+                transform: translateX(180px) scale(0.85);
 
             .fullscreen-btn {
                 position: static;
@@ -586,6 +762,12 @@
                 top: calc(var(--baseline) * -2.5);
                 font-size: calc(var(--baseline) * 0.9);
             }
+            .empty-page #flip_book {
+                transform: scale(0.65);
+                transform-origin: center center;
+            }
+            .empty-page #cover_checkbox:checked ~ #flip_book {
+                transform: translateX(180px) scale(0.65);
 
             /* Quiz mobile styles for small screens */
             #quizContainer {
@@ -833,12 +1015,92 @@
         </div>
     </div>
 
-    <!-- EMPTY PAGE (replaces flipbook) -->
+    <!-- FLIP BOOK -->
     <div class="empty-page" id="emptyPage">
         <button class="back-btn" id="backFromEmptyPage">
             <span class="back-home-en">← Back</span>
             <span class="back-home-ar" style="display: none;">← رجوع</span>
         </button>
+
+        <input type="checkbox" id="cover_checkbox">
+        <input type="checkbox" id="page1_checkbox">
+        <input type="checkbox" id="page2_checkbox">
+        <input type="checkbox" id="page3_checkbox">
+        <input type="checkbox" id="page4_checkbox">
+        <input type="checkbox" id="page5_checkbox">
+
+        <div id="flip_book">
+            <div class="front_cover">
+                <label for="cover_checkbox" id="cover"></label>
+            </div>
+
+            <div class="page" id="page1">
+                <div class="front_page">
+                    <label for="page1_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/front_page_edge_shading.webp" alt="">
+                    <img class="front_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page1.webp" alt="">
+                </div>
+                <div class="back_page">
+                    <label for="page1_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/back_page_edge_shading.webp" alt="">
+                    <img class="back_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page2.webp" alt="">
+                </div>
+            </div>
+
+            <div class="page" id="page2">
+                <div class="front_page">
+                    <label for="page2_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/front_page_edge_shading.webp" alt="">
+                    <img class="front_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page3.webp" alt="">
+                </div>
+                <div class="back_page">
+                    <label for="page2_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/back_page_edge_shading.webp" alt="">
+                    <img class="back_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page4.webp" alt="">
+                </div>
+            </div>
+
+            <div class="page" id="page3">
+                <div class="front_page">
+                    <label for="page3_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/front_page_edge_shading.webp" alt="">
+                    <img class="front_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page5.webp" alt="">
+                </div>
+                <div class="back_page">
+                    <label for="page3_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/back_page_edge_shading.webp" alt="">
+                    <img class="back_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page6.webp" alt="">
+                </div>
+            </div>
+
+            <div class="page" id="page4">
+                <div class="front_page">
+                    <label for="page4_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/front_page_edge_shading.webp" alt="">
+                    <img class="front_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page7.webp" alt="">
+                </div>
+                <div class="back_page">
+                    <label for="page4_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/back_page_edge_shading.webp" alt="">
+                    <img class="back_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page8.webp" alt="">
+                </div>
+            </div>
+
+            <div class="page" id="page5">
+                <div class="front_page">
+                    <label for="page5_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/front_page_edge_shading.webp" alt="">
+                    <img class="front_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page9.webp" alt="">
+                </div>
+                <div class="back_page">
+                    <label for="page5_checkbox"></label>
+                    <img class="edge_shading" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/back_page_edge_shading.webp" alt="">
+                    <img class="back_content" src="https://raw.githubusercontent.com/fchavonet/creative_coding-flip_book/main/assets/images/pages/page10.webp" alt="">
+                </div>
+            </div>
+
+            <div class="back_cover"></div>
+        </div>
     </div>
 
 
@@ -1130,7 +1392,7 @@
                     
                     setTimeout(() => {
                         levelPage.style.display = 'none';
-                        emptyPage.style.display = 'block';
+                        emptyPage.style.display = 'flex';
                         
                         // Fade in the empty page
                         emptyPage.style.opacity = '0';
@@ -1174,6 +1436,8 @@
                     emptyPage.style.display = 'none';
                     emptyPage.style.opacity = '1';
                     emptyPage.style.transition = '';
+                    // Reset flipbook to closed state
+                    document.querySelectorAll('.empty-page input[type="checkbox"]').forEach(cb => cb.checked = false);
                     levelPage.style.display = 'flex';
                     levelPage.style.opacity = '0';
                     levelPage.style.transition = 'opacity 0.5s ease-in';
