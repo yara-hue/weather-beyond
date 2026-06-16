@@ -402,101 +402,332 @@
         }
 
         /* Hide flipbook initially */
-        .flipbook-container {
-            max-width: 900px;
-            width: 100%;
-            background: var(--background);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+        /* ========== READING PAGE – Realistic Book Design ========== */
+
+        .read-page {
             position: relative;
+            max-width: 960px;
+            width: 100%;
+            background: #1f1a16;
+            border-radius: 8px;
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.5),
+                0 10px 30px rgba(0, 0, 0, 0.3);
             display: none;
-        }
-
-        .book-header {
-            background: var(--primary);
-            color: var(--text);
-            padding: 15px 20px;
-            text-align: center;
-            position: relative;
-        }
-
-        .book-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .page-counter {
-            font-size: 1em;
-            opacity: 0.9;
-        }
-
-        .page-display {
-            position: relative;
-            width: 100%;
-            height: 70vh;
-            min-height: 400px;
-            background: var(--background);
-            display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
         }
 
-        .btn.side-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.2);
-            color: var(--text);
-            border: none;
-            padding: 15px 20px;
-            border-radius: 50%;
+        /* ── Header / Title Bar ── */
+
+        .read-header {
+            background: linear-gradient(180deg, #3d2820 0%, #2c1a12 100%);
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #4a3024;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #d4c5b5;
+            padding: 6px 14px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 24px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            min-width: 60px;
-            height: 60px;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .read-title {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: #ede0d0;
+            letter-spacing: 0.5px;
+            font-family: 'Georgia', serif;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .page-num {
+            font-size: 0.82em;
+            color: #b8a898;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .audio-btn {
+            background: none;
+            border: none;
+            color: #d4c5b5;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.25s ease;
+            line-height: 1;
+        }
+        .audio-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ── Book Wrapper & Surface ── */
+
+        .book-wrapper {
+            position: relative;
+            padding: 28px 40px 50px 28px;
+            background:
+                radial-gradient(ellipse at 50% 100%, #3a2a20 0%, transparent 50%),
+                linear-gradient(180deg, #2a201a 0%, #1f1814 100%);
+            min-height: 65vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(10px);
-            z-index: 10;
         }
 
-        .btn.side-nav:hover {
-            background: rgba(255, 255, 255, 0.35);
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        .book-shadow {
+            position: absolute;
+            bottom: 18px;
+            left: 8%;
+            right: 8%;
+            height: 30px;
+            background: radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
+            filter: blur(10px);
+            pointer-events: none;
         }
 
-        .btn.side-nav:disabled {
-            background: rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.3);
-            cursor: not-allowed;
-            transform: translateY(-50%);
-            box-shadow: none;
+        /* ── The Book ── */
+
+        .book {
+            position: relative;
+            width: 100%;
+            max-width: 780px;
+            aspect-ratio: 4 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .left-nav {
-            left: 20px;
+        /* Book cover / spine (visible on the left) */
+        .book-cover-spine {
+            position: absolute;
+            left: -10px;
+            top: -6px;
+            bottom: -6px;
+            width: 28px;
+            background: linear-gradient(
+                90deg,
+                #5a3a28 0%,
+                #7a4f35 20%,
+                #6a422c 50%,
+                #4d2e1e 80%,
+                #3d2216 100%
+            );
+            border-radius: 4px 2px 2px 4px;
+            box-shadow:
+                inset -1px 0 0 rgba(255, 255, 255, 0.06),
+                inset 1px 0 0 rgba(0, 0, 0, 0.3),
+                -2px 0 6px rgba(0, 0, 0, 0.3);
+            z-index: 5;
+        }
+        .book-cover-spine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 4px;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #8a6a4a 0%, #6a4a30 50%, #8a6a4a 100%);
+            opacity: 0.4;
+            border-radius: 1px;
         }
 
-        .right-nav {
-            right: 20px;
+        /* Page stack edges */
+        .pg-stack {
+            position: absolute;
+            background: #f2ede4;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .pg-stack-top {
+            top: -2px;
+            left: 16px;
+            right: 10px;
+            height: 4px;
+            border-radius: 2px 2px 0 0;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 -1px 0 #e5ddd2;
+        }
+        .pg-stack-bottom {
+            bottom: -2px;
+            left: 16px;
+            right: 10px;
+            height: 4px;
+            border-radius: 0 0 2px 2px;
+            box-shadow:
+                inset 0 -1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 1px 0 #e5ddd2;
+        }
+        .pg-stack-fore {
+            top: 4px;
+            bottom: 4px;
+            right: -2px;
+            width: 4px;
+            border-radius: 0 2px 2px 0;
+            box-shadow:
+                inset -1px 0 0 rgba(255, 255, 255, 0.7),
+                inset 1px 0 0 #e5ddd2;
+        }
+
+        /* ── Page Area (where images display) ── */
+
+        .page-area {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #fff8f0;
+            border-radius: 2px 8px 8px 2px;
+            box-shadow:
+                inset -2px 0 12px rgba(0, 0, 0, 0.04),
+                inset 2px 0 8px rgba(0, 0, 0, 0.02),
+                0 2px 20px rgba(0, 0, 0, 0.25);
+            z-index: 2;
+            overflow: hidden;
         }
 
         .page-container {
             position: relative;
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
+
+        /* ── Page-turn corner hotspots ── */
+
+        .turn-corner {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 35%;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.3s ease;
+        }
+        .turn-corner::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            opacity: 0;
+            transition: all 0.35s ease;
+        }
+        .turn-corner:hover::after {
+            opacity: 1;
+        }
+        .turn-corner:active::after {
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .turn-prev {
+            left: 0;
+        }
+        .turn-prev::after {
+            left: 18px;
+            border-right: none;
+            border-bottom: none;
+            transform: translateY(-50%) rotate(-45deg);
+        }
+
+        .turn-next {
+            right: 0;
+        }
+        .turn-next::after {
+            right: 18px;
+            border-left: none;
+            border-top: none;
+            transform: translateY(-50%) rotate(-45deg);
+        }
+
+        .turn-corner:disabled {
+            cursor: default;
+        }
+        .turn-corner:disabled::after {
+            opacity: 0 !important;
+        }
+
+        /* ── Footer & End Options ── */
+
+        .read-footer {
+            background: linear-gradient(0deg, #2c1a12 0%, #3d2820 100%);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top: 1px solid #4a3024;
+            min-height: 44px;
+        }
+
+        /* end-options moved to book design section */
+
+        .quiz-btn {
+            background: linear-gradient(135deg, #6a9060 0%, #4d7043 100%);
+            border: none;
+            color: #fff;
+            padding: 8px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 700;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .quiz-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+            filter: brightness(1.1);
+        }
+
+        /* ── Loading Spinner ── */
+
+        .loading-indicator {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+        }
+        .loading-indicator .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 119, 90, 0.2);
+            border-top-color: #8b775a;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ── Page Wrapper / Flip Animation ── */
 
         .page-wrapper {
             position: absolute;
@@ -648,222 +879,66 @@
             filter: brightness(1.02);
         }
 
-        .loading-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
-        }
+        /* ── RTL Support for Arabic ── */
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .controls {
-            background: linear-gradient(135deg, rgba(148, 213, 216, 0.1), rgba(109, 175, 202, 0.1));
-            padding: 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            backdrop-filter: blur(10px);
-            border-top: 2px solid rgba(148, 213, 216, 0.2);
-            min-height: 80px;
-        }
-
-        /* RTL Support for Arabic */
-        .flipbook-container.rtl {
+        .read-page.rtl .read-header {
             direction: rtl;
         }
-
-        .flipbook-container.rtl .book-header {
-            text-align: right;
-        }
-
-        .flipbook-container.rtl .controls {
-            direction: rtl;
-        }
-
-        /* RTL Support for side navigation */
-        .flipbook-container.rtl .left-nav {
+        .read-page.rtl .turn-prev {
             left: auto;
-            right: 20px;
+            right: 0;
         }
-
-        .flipbook-container.rtl .right-nav {
+        .read-page.rtl .turn-prev::after {
+            left: auto;
+            right: 18px;
+            border-left: none;
+            border-top: none;
+            border-right: 2px solid rgba(255, 255, 255, 0.15);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+            transform: translateY(-50%) rotate(-45deg);
+        }
+        .read-page.rtl .turn-next {
             right: auto;
-            left: 20px;
+            left: 0;
         }
-
-        .flipbook-container.rtl .nav-buttons {
-            flex-direction: row-reverse;
+        .read-page.rtl .turn-next::after {
+            right: auto;
+            left: 18px;
+            border-right: none;
+            border-bottom: none;
+            border-left: 2px solid rgba(255, 255, 255, 0.15);
+            border-top: 2px solid rgba(255, 255, 255, 0.15);
+            transform: translateY(-50%) rotate(-45deg);
         }
-
-        .flipbook-container.rtl .page-counter {
-            direction: rtl;
+        .read-page.rtl .book-cover-spine {
+            left: auto;
+            right: -10px;
+            border-radius: 2px 4px 4px 2px;
+            box-shadow:
+                inset 1px 0 0 rgba(255, 255, 255, 0.06),
+                inset -1px 0 0 rgba(0, 0, 0, 0.3),
+                2px 0 6px rgba(0, 0, 0, 0.3);
         }
-
-        /* RTL Navigation - swap prev/next button positions */
-        .flipbook-container.rtl .nav-buttons .btn:first-child {
-            order: 2;
+        .read-page.rtl .book-cover-spine::after {
+            left: auto;
+            right: 4px;
         }
-
-        .flipbook-container.rtl .nav-buttons .btn:last-child {
-            order: 1;
+        .read-page.rtl .pg-stack-top {
+            left: 10px;
+            right: 16px;
         }
-
-        /* Match website styling - Enhanced flipbook design */
-        .flipbook-container {
-            max-width: 900px;
-            width: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(148, 213, 216, 0.1));
-            border-radius: 25px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            position: relative;
-            display: none;
-            backdrop-filter: blur(20px);
+        .read-page.rtl .pg-stack-bottom {
+            left: 10px;
+            right: 16px;
         }
-
-        .book-header {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: var(--text);
-            padding: 20px 25px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(255, 168, 102, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .read-page.rtl .pg-stack-fore {
+            right: auto;
+            left: -2px;
+            border-radius: 2px 0 0 2px;
         }
-
-        .book-header .back-to-home-btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--text);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-            font-weight: bold;
-            backdrop-filter: blur(10px);
-            flex-shrink: 0;
+        .read-page.rtl .page-area {
+            border-radius: 8px 2px 2px 8px;
         }
-
-        .book-header .back-to-home-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .read-aloud-header-btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--text);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-            font-weight: bold;
-            backdrop-filter: blur(10px);
-            flex-shrink: 0;
-        }
-
-        .read-aloud-header-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .book-title {
-            font-size: 1.6em;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            flex: 1;
-            text-align: center;
-            margin: 0 20px;
-        }
-
-        .page-counter {
-            font-size: 0.9em;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        /* RTL adjustments for back button */
-        .flipbook-container.rtl .book-header .back-to-home-btn {
-            order: 3;
-        }
-
-        .controls {
-            background: linear-gradient(135deg, rgba(148, 213, 216, 0.1), rgba(109, 175, 202, 0.1));
-            padding: 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .btn.minimal-nav {
-            background: rgba(255, 255, 255, 0.2);
-            color: var(--text);
-            border: none;
-            padding: 15px 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 24px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            min-width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .btn.minimal-nav:hover {
-            background: rgba(255, 255, 255, 0.35);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn.minimal-nav:disabled {
-            background: rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.3);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .end-options {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-
-        /* Quiz button styles removed - now uses minimal-nav class */
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -922,50 +997,32 @@
                 font-size: 2.2em;
             }
 
-            .page-display {
-                height: 60vh;
-                min-height: 300px;
+            .book-wrapper {
+                padding: 16px 14px;
+                min-height: 50vh;
             }
-
-            .controls {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px;
-            }
-
-            .nav-buttons {
-                justify-content: center;
-                width: 100%;
-            }
-
-            .btn {
-                flex: 1;
-                max-width: 120px;
-                padding: 12px 20px;
+            .read-title {
                 font-size: 1em;
             }
-
-            .btn.side-nav {
-                padding: 12px 15px;
-                min-width: 50px;
-                height: 50px;
-                font-size: 20px;
+            .read-header {
+                padding: 8px 12px;
             }
-
-            .book-title {
-                font-size: 1.2em;
-            }
-
-            .book-header {
-                padding: 15px 20px;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .book-header .back-to-home-btn,
-            .read-aloud-header-btn {
-                padding: 6px 12px;
+            .back-btn {
                 font-size: 0.8em;
+                padding: 4px 10px;
+            }
+            .header-right {
+                gap: 8px;
+            }
+            .page-num {
+                font-size: 0.75em;
+            }
+            .audio-btn {
+                font-size: 1em;
+            }
+            .read-footer {
+                padding: 8px 12px;
+                min-height: 36px;
             }
 
             .fullscreen-btn {
@@ -1045,38 +1102,36 @@
                 font-size: 1.2em;
             }
 
-            .page-display {
-                height: 50vh;
-                min-height: 250px;
+            .book-wrapper {
+                padding: 12px 10px;
+                min-height: 40vh;
             }
-
-            .btn {
-                padding: 10px 15px;
+            .read-title {
                 font-size: 0.9em;
             }
-
-            .btn.side-nav {
-                padding: 10px 12px;
-                min-width: 45px;
-                height: 45px;
-                font-size: 18px;
+            .read-header {
+                padding: 6px 10px;
             }
-
-            .left-nav {
-                left: 10px;
+            .back-btn {
+                font-size: 0.75em;
+                padding: 3px 8px;
             }
-
-            .right-nav {
-                right: 10px;
+            .header-right {
+                gap: 6px;
             }
-
-            .book-header {
-                padding: 12px 15px;
+            .page-num {
+                font-size: 0.7em;
             }
-
-            .book-title {
-                font-size: 1em;
-                margin: 0 10px;
+            .audio-btn {
+                font-size: 0.9em;
+            }
+            .read-footer {
+                padding: 6px 10px;
+                min-height: 32px;
+            }
+            .quiz-btn {
+                font-size: 0.8em;
+                padding: 6px 16px;
             }
 
             /* Quiz mobile styles for small screens */
@@ -1119,12 +1174,6 @@
                 transform: scale(0.95);
             }
 
-            /* Increase touch targets */
-            .btn.side-nav {
-                min-width: 60px;
-                height: 60px;
-            }
-
             .language-btn {
                 min-height: 48px;
                 min-width: 80px;
@@ -1148,9 +1197,9 @@
                 height: 45px;
             }
 
-            .page-display {
-                height: 70vh;
-                min-height: 200px;
+            .book-wrapper {
+                padding: 14px 16px;
+                min-height: 60vh;
             }
 
             .level-title {
@@ -1333,47 +1382,64 @@
     </div>
 
     <!-- FLIPBOOK APPLICATION -->
-    <div class="flipbook-container" id="flipbook">
-        <div class="book-header">
-            <button class="back-to-home-btn" id="backToHomeFromFlipbook">
+    <div class="read-page" id="flipbook">
+        <div class="read-header">
+            <button class="back-btn" id="backToHomeFromFlipbook">
                 <span class="back-home-en">← Back</span>
                 <span class="back-home-ar" style="display: none;">← رجوع</span>
             </button>
-            <div class="book-title" id="bookTitle">Interactive Flipbook</div>
-            <div class="page-counter" id="pageCounter">Page 1 of 10</div>
-            <button class="read-aloud-header-btn" id="readAloudBtn">
-                <span class="read-aloud-en">Read Aloud</span>
-                <span class="read-aloud-ar" style="display: none;">اقرأ بصوت عالٍ</span>
-            </button>
+            <span class="read-title" id="bookTitle">The Sun Sneezes</span>
+            <div class="header-right">
+                <span class="page-num" id="pageCounter">1 / 10</span>
+                <button class="audio-btn" id="readAloudBtn">
+                    <span class="read-aloud-en">🔊</span>
+                    <span class="read-aloud-ar" style="display: none;">🔊</span>
+                </button>
+            </div>
         </div>
 
-        <div class="page-display">
-            <button class="btn side-nav left-nav" id="prevBtn">
-                <span class="prev-en"><</span>
-                <span class="prev-ar" style="display: none;">></span>
-            </button>
-            <div class="page-container" id="pageContainer">
-                <!-- Pages will be dynamically inserted here -->
+        <div class="book-wrapper">
+            <!-- Book shadow cast on surface -->
+            <div class="book-shadow"></div>
+
+            <div class="book">
+                <!-- Book cover/spine (left side) -->
+                <div class="book-cover-spine"></div>
+
+                <!-- Page stack edges (top, bottom, fore-edge) -->
+                <div class="pg-stack pg-stack-top"></div>
+                <div class="pg-stack pg-stack-bottom"></div>
+                <div class="pg-stack pg-stack-fore"></div>
+
+                <!-- The page area where images display -->
+                <div class="page-area">
+                    <div class="page-container" id="pageContainer">
+                        <!-- Pages will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Page-turn corner hotspots -->
+                <button class="turn-corner turn-prev" id="prevBtn">
+                    <span class="prev-en"></span>
+                    <span class="prev-ar" style="display: none;"></span>
+                </button>
+                <button class="turn-corner turn-next" id="nextBtn">
+                    <span class="next-en"></span>
+                    <span class="next-ar" style="display: none;"></span>
+                </button>
             </div>
-            <button class="btn side-nav right-nav" id="nextBtn">
-                <span class="next-en">></span>
-                <span class="next-ar" style="display: none;"><</span>
-            </button>
+        </div>
+
+        <div class="read-footer">
             <div class="loading-indicator" id="loadingIndicator">
                 <div class="spinner"></div>
             </div>
-        </div>
-
-        <div class="controls">
-            <!-- Navigation buttons moved to page-display area -->
-        </div>
-
-        <!-- Quiz button that appears after last page -->
-        <div class="end-options" id="endOptions" style="display: none;">
-            <button class="btn minimal-nav" id="goToQuizBtn">
-                <span class="quiz-en">Take Quiz 📝</span>
-                <span class="quiz-ar" style="display: none;">خذ الاختبار 📝</span>
-            </button>
+            <div class="end-options" id="endOptions" style="display: none;">
+                <button class="quiz-btn" id="goToQuizBtn">
+                    <span class="quiz-en">📝 Quiz</span>
+                    <span class="quiz-ar" style="display: none;">📝 اختبار</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1556,6 +1622,7 @@
                 this.goToQuizBtn = document.getElementById('goToQuizBtn');
                 this.endOptions = document.getElementById('endOptions');
                 this.loadingIndicator = document.getElementById('loadingIndicator');
+                this.pageCounter = document.getElementById('pageCounter');
             }
 
             createPages() {
@@ -1950,24 +2017,18 @@
                 this.prevBtn.disabled = this.currentPage === 0;
                 this.nextBtn.disabled = this.currentPage === this.totalPages - 1;
                 
+                // Update page counter
+                this.pageCounter.textContent = `${this.currentPage + 1} / ${this.totalPages}`;
+                
                 // Check if Arabic is active for RTL layout
                 const isArabic = document.getElementById('arabicBtn') && document.getElementById('arabicBtn').classList.contains('active');
-                const flipbookContainer = document.querySelector('.flipbook-container');
+                const flipbookContainer = document.querySelector('.read-page');
                 
                 // Apply RTL class for Arabic
                 if (isArabic) {
                     flipbookContainer.classList.add('rtl');
                 } else {
                     flipbookContainer.classList.remove('rtl');
-                }
-                
-                // Update button symbols for minimal design
-                if (isArabic) {
-                    this.prevBtn.innerHTML = '<';
-                    this.nextBtn.innerHTML = '>';
-                } else {
-                    this.prevBtn.innerHTML = '<';
-                    this.nextBtn.innerHTML = '>';
                 }
 
                 // Show/hide quiz button on last page
@@ -3388,7 +3449,7 @@
 
         // Function to change book title (call from browser console if needed)
         function changeTitle(newTitle) {
-            document.querySelector('.book-title').textContent = newTitle;
+            document.querySelector('.read-title').textContent = newTitle;
         }
     </script>
 </body>
